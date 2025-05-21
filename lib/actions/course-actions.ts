@@ -39,7 +39,7 @@ export async function getAllCourses() {
     return courses.map((course) => ({
       ...course,
       rating: course.rating || 4.5,
-      enrolled: course.enrolled || Math.floor(Math.random() * 500) + 100,
+      enrolled: course.enrolled || Math.floor(Math.random() * 50) + 10,
       topics: course.topics || "[]",
     }));
   } catch (error) {

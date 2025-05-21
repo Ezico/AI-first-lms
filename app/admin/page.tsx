@@ -1,133 +1,14 @@
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { BookOpen, DollarSign, TrendingUp, Users } from "lucide-react";
-// import { AdminAnalyticsChart } from "@/components/admin/admin-analytics-chart";
-// import { AdminRecentActivity } from "@/components/admin/admin-recent-activity";
-
-// export default async function AdminDashboardPage() {
-//   // In a real app, these would come from database queries
-//   const stats = {
-//     totalUsers: 256,
-//     totalCourses: 12,
-//     totalRevenue: 45750,
-//     activeEnrollments: 389,
-//   };
-
-//   // Mock data for the chart
-//   const revenueData = [
-//     { month: "Jan", revenue: 4200 },
-//     { month: "Feb", revenue: 4800 },
-//     { month: "Mar", revenue: 5100 },
-//     { month: "Apr", revenue: 5400 },
-//     { month: "May", revenue: 6200 },
-//     { month: "Jun", revenue: 7100 },
-//     { month: "Jul", revenue: 8200 },
-//     { month: "Aug", revenue: 7600 },
-//     { month: "Sep", revenue: 6900 },
-//     { month: "Oct", revenue: 6300 },
-//     { month: "Nov", revenue: 5900 },
-//     { month: "Dec", revenue: 6800 },
-//   ];
-
-//   return (
-//     <div className="p-6 space-y-6">
-//       <div className="flex items-center justify-between mb-6">
-//         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-//       </div>
-
-//       {/* Stats Cards */}
-//       {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-//         <Card className="bg-white">
-//           <CardHeader className="flex flex-row items-center justify-between pb-2">
-//             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-//             <Users className="h-4 w-4 text-muted-foreground" />
-//           </CardHeader>
-//           <CardContent>
-//             <div className="text-2xl font-bold">{stats.totalUsers}</div>
-//             <p className="text-xs text-muted-foreground">
-//               +12% from last month
-//             </p>
-//           </CardContent>
-//         </Card>
-
-//         <Card className="bg-white">
-//           <CardHeader className="flex flex-row items-center justify-between pb-2">
-//             <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-//             <BookOpen className="h-4 w-4 text-muted-foreground" />
-//           </CardHeader>
-//           <CardContent>
-//             <div className="text-2xl font-bold">{stats.totalCourses}</div>
-//             <p className="text-xs text-muted-foreground">+2 new this month</p>
-//           </CardContent>
-//         </Card>
-
-//         <Card className="bg-white">
-//           <CardHeader className="flex flex-row items-center justify-between pb-2">
-//             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-//             <DollarSign className="h-4 w-4 text-muted-foreground" />
-//           </CardHeader>
-//           <CardContent>
-//             <div className="text-2xl font-bold">
-//               ${stats.totalRevenue.toLocaleString()}
-//             </div>
-//             <p className="text-xs text-muted-foreground">
-//               +18% from last month
-//             </p>
-//           </CardContent>
-//         </Card>
-
-//         <Card className="bg-white">
-//           <CardHeader className="flex flex-row items-center justify-between pb-2">
-//             <CardTitle className="text-sm font-medium">
-//               Active Enrollments
-//             </CardTitle>
-//             <TrendingUp className="h-4 w-4 text-muted-foreground" />
-//           </CardHeader>
-//           <CardContent>
-//             <div className="text-2xl font-bold">{stats.activeEnrollments}</div>
-//             <p className="text-xs text-muted-foreground">+24 this week</p>
-//           </CardContent>
-//         </Card>
-//       </div> */}
-
-//       {/* Charts and Recent Activity */}
-//       {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-//         <Card className="col-span-2 bg-white">
-//           <CardHeader>
-//             <CardTitle>Revenue Overview</CardTitle>
-//           </CardHeader>
-//           <CardContent>
-//             <AdminAnalyticsChart data={revenueData} />
-//           </CardContent>
-//         </Card>
-
-//         <Card className="bg-white">
-//           <CardHeader>
-//             <CardTitle>Recent Activity</CardTitle>
-//           </CardHeader>
-//           <CardContent>
-//             <AdminRecentActivity />
-//           </CardContent>
-//         </Card>
-//       </div> */}
-
-//     </div>
-//   );
-// }
-
 "use server";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
-import { getAllCoursesAdmin, deleteCourse } from "@/lib/actions/course-actions";
+import { PlusCircle, Edit, Eye } from "lucide-react";
+import { getAllCoursesAdmin } from "@/lib/actions/course-actions";
 import { formatCurrency } from "@/lib/utils";
-import { neon } from "@neondatabase/serverless";
+import DeleteCourseButton from "@/components/admin/delete-course";
 
 export default async function AdminCoursesPage() {
   const courses = await getAllCoursesAdmin();
-  // connect to neon and get data from db
-  // const sql = neon(process.env.DATABASE_URL!);
-  // console.log(sql, "sql");
 
   return (
     <div className="p-6 space-y-6">
@@ -253,20 +134,7 @@ export default async function AdminCoursesPage() {
                             <Edit className="h-4 w-4" />
                           </Button>
                         </Link>
-                        {/* <form
-                          action={async () => {
-                            await deleteCourse(course.id);
-                          }}
-                        >
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-600 hover:text-red-800"
-                            type="submit"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </form> */}
+                        <DeleteCourseButton id={course.id} />
                       </div>
                     </td>
                   </tr>

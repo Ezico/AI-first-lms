@@ -1,14 +1,14 @@
-import { requireAuth } from "@/lib/auth-utils"
-import DashboardClient from "@/components/academy/dashboard-client"
-import { getUserEnrollments } from "@/lib/actions/enrollment"
-import { executeQuery } from "@/lib/db"
+import { requireAuth } from "@/lib/auth-utils";
+import DashboardClient from "@/components/academy/dashboard-client";
+import { getUserEnrollments } from "@/lib/actions/enrollment";
+import { executeQuery } from "@/lib/db";
 
 export default async function DashboardPage() {
   // Use our custom auth system instead of NextAuth
-  const user = requireAuth("/auth/signin")
+  const user = await requireAuth("/auth/signin");
 
   // Get user enrollments
-  const enrollments = await getUserEnrollments()
+  const enrollments = await getUserEnrollments();
 
   // Get recommended courses (courses user is not enrolled in)
   const recommendedCourses = await executeQuery(
@@ -30,8 +30,14 @@ export default async function DashboardPage() {
     ORDER BY c.featured DESC, RANDOM()
     LIMIT 2
   `,
-    [user.id],
-  )
+    [user.id]
+  );
 
-  return <DashboardClient user={user} enrollments={enrollments} recommendedCourses={recommendedCourses || []} />
+  return (
+    <DashboardClient
+      user={user}
+      enrollments={enrollments}
+      recommendedCourses={recommendedCourses || []}
+    />
+  );
 }

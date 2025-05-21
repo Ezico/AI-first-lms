@@ -1,28 +1,30 @@
-"use server"
+"use server";
 
-import { getServerUser, requireAuth } from "@/lib/auth-utils"
-import { executeQuery } from "@/lib/db"
-import { revalidatePath } from "next/cache"
-import { neon } from "@neondatabase/serverless"
+import { requireAuth } from "@/lib/auth-utils";
+import { executeQuery } from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { neon } from "@neondatabase/serverless";
+import { cookies } from "next/headers";
+import getServerUser from "./getUserFunction";
 
-const sql = neon(process.env.DATABASE_URL!)
+const sql = neon(process.env.DATABASE_URL!);
 
 // Helper function to extract numeric ID from string IDs like "lesson-1-1"
 function extractNumericId(id: string): number {
   // If the id is already a number, return it
   if (!isNaN(Number(id))) {
-    return Number(id)
+    return Number(id);
   }
 
   // Try to extract a numeric ID from strings like "lesson-1-1"
-  const matches = id.match(/\d+/g)
+  const matches = id.match(/\d+/g);
   if (matches && matches.length > 0) {
     // Use the last number in the string as the ID
-    return Number.parseInt(matches[matches.length - 1], 10)
+    return Number.parseInt(matches[matches.length - 1], 10);
   }
 
   // Default fallback
-  return 0
+  return 0;
 }
 
 export async function isUserEnrolled(userId: number, courseId: number) {
@@ -31,36 +33,45 @@ export async function isUserEnrolled(userId: number, courseId: number) {
       SELECT COUNT(*) as count
       FROM enrollments
       WHERE user_id = ${userId} AND course_id = ${courseId}
-    `
-    return result[0].count > 0
+    `;
+    return result[0].count > 0;
   } catch (error) {
-    console.error(`Failed to check enrollment for user ${userId} and course ${courseId}:`, error)
-    return false
+    console.error(
+      `Failed to check enrollment for user ${userId} and course ${courseId}:`,
+      error
+    );
+    return false;
   }
 }
 
 export async function enrollUserInCourse(userId: number, courseId: number) {
   try {
     // Check if already enrolled
-    const isEnrolled = await isUserEnrolled(userId, courseId)
+    const isEnrolled = await isUserEnrolled(userId, courseId);
     if (isEnrolled) {
-      return { success: true, message: "Already enrolled in this course" }
+      return { success: true, message: "Already enrolled in this course" };
     }
 
     // Enroll the user
     await sql`
       INSERT INTO enrollments (user_id, course_id)
       VALUES (${userId}, ${courseId})
-    `
-    return { success: true, message: "Successfully enrolled in course" }
+    `;
+    return { success: true, message: "Successfully enrolled in course" };
   } catch (error) {
-    console.error(`Failed to enroll user ${userId} in course ${courseId}:`, error)
-    return { success: false, message: "Failed to enroll in course" }
+    console.error(
+      `Failed to enroll user ${userId} in course ${courseId}:`,
+      error
+    );
+    return { success: false, message: "Failed to enroll in course" };
   }
 }
 
-export async function enrollInCourse(courseId: number, paymentIntentId?: string) {
-  const user = requireAuth()
+export async function enrollInCourse(
+  courseId: number,
+  paymentIntentId?: string
+) {
+  const user = await requireAuth();
 
   try {
     // Check if user is already enrolled
@@ -69,11 +80,15 @@ export async function enrollInCourse(courseId: number, paymentIntentId?: string)
       SELECT id FROM enrollments
       WHERE user_id = $1 AND course_id = $2
     `,
-      [user.id, courseId],
-    )
+      [user.id, courseId]
+    );
 
     if (existingEnrollment && existingEnrollment.length > 0) {
-      return { success: true, message: "Already enrolled", enrollmentId: existingEnrollment[0].id }
+      return {
+        success: true,
+        message: "Already enrolled",
+        enrollmentId: existingEnrollment[0].id,
+      };
     }
 
     // Create new enrollment
@@ -83,11 +98,11 @@ export async function enrollInCourse(courseId: number, paymentIntentId?: string)
       VALUES ($1, $2, NOW())
       RETURNING id
     `,
-      [user.id, courseId],
-    )
+      [user.id, courseId]
+    );
 
     if (!enrollment || enrollment.length === 0) {
-      throw new Error("Failed to create enrollment")
+      throw new Error("Failed to create enrollment");
     }
 
     // Get all lessons for this course
@@ -99,8 +114,8 @@ export async function enrollInCourse(courseId: number, paymentIntentId?: string)
       WHERE m.course_id = $1
       ORDER BY m.order, l.order
     `,
-      [courseId],
-    )
+      [courseId]
+    );
 
     // Create initial progress records for all lessons
     if (lessons && lessons.length > 0) {
@@ -110,31 +125,33 @@ export async function enrollInCourse(courseId: number, paymentIntentId?: string)
           INSERT INTO progress (enrollment_id, lesson_id, completed, progress, last_accessed)
           VALUES ($1, $2, false, 0, NOW())
         `,
-          [enrollment[0].id, lesson.id],
-        )
+          [enrollment[0].id, lesson.id]
+        );
       }
     }
 
     // If payment intent provided, save it (in a real app)
     if (paymentIntentId) {
       // In a real app, you would save the payment intent ID
-      console.log(`Payment intent ${paymentIntentId} for enrollment ${enrollment[0].id}`)
+      console.log(
+        `Payment intent ${paymentIntentId} for enrollment ${enrollment[0].id}`
+      );
     }
 
-    revalidatePath("/academy/dashboard")
-    return { success: true, enrollmentId: enrollment[0].id }
+    revalidatePath("/academy/dashboard");
+    return { success: true, enrollmentId: enrollment[0].id };
   } catch (error) {
-    console.error("Enrollment error:", error)
-    throw new Error("Failed to enroll in course")
+    console.error("Enrollment error:", error);
+    throw new Error("Failed to enroll in course");
   }
 }
 
 export async function getUserEnrollments() {
   // Use our custom auth system instead of NextAuth
-  const user = getServerUser()
+  const user = await getServerUser();
 
   if (!user) {
-    return []
+    return [];
   }
 
   try {
@@ -158,22 +175,26 @@ export async function getUserEnrollments() {
       WHERE e.user_id = $1
       ORDER BY e.enrolled_at DESC
     `,
-      [user.id],
-    )
+      [user.id]
+    );
 
-    return enrollments || []
+    return enrollments || [];
   } catch (error) {
-    console.error("Get user enrollments error:", error)
-    return []
+    console.error("Get user enrollments error:", error);
+    return [];
   }
 }
 
-export async function updateLessonProgress(lessonId: string, progress: number, completed: boolean) {
+export async function updateLessonProgress(
+  lessonId: string,
+  progress: number,
+  completed: boolean
+) {
   // Use our custom auth system instead of NextAuth
-  const user = requireAuth()
+  const user = await requireAuth();
 
   // Extract numeric lesson ID
-  const numericLessonId = extractNumericId(lessonId)
+  const numericLessonId = extractNumericId(lessonId);
 
   try {
     // First, check if the user is enrolled in the course that contains this lesson
@@ -186,14 +207,14 @@ export async function updateLessonProgress(lessonId: string, progress: number, c
       WHERE l.id = $1 AND e.user_id = $2
       LIMIT 1
     `,
-      [numericLessonId, user.id],
-    )
+      [numericLessonId, user.id]
+    );
 
     if (!enrollmentCheck || enrollmentCheck.length === 0) {
-      throw new Error("User is not enrolled in this course")
+      throw new Error("User is not enrolled in this course");
     }
 
-    const enrollmentId = enrollmentCheck[0].id
+    const enrollmentId = enrollmentCheck[0].id;
 
     // Check if progress record exists
     const progressCheck = await executeQuery(
@@ -202,8 +223,8 @@ export async function updateLessonProgress(lessonId: string, progress: number, c
       WHERE enrollment_id = $1 AND lesson_id = $2
       LIMIT 1
     `,
-      [enrollmentId, numericLessonId],
-    )
+      [enrollmentId, numericLessonId]
+    );
 
     if (progressCheck && progressCheck.length > 0) {
       // Update existing progress
@@ -213,8 +234,8 @@ export async function updateLessonProgress(lessonId: string, progress: number, c
         SET progress = $1, completed = $2, last_accessed = NOW()
         WHERE enrollment_id = $3 AND lesson_id = $4
       `,
-        [progress, completed, enrollmentId, numericLessonId],
-      )
+        [progress, completed, enrollmentId, numericLessonId]
+      );
     } else {
       // Create new progress record
       await executeQuery(
@@ -222,8 +243,8 @@ export async function updateLessonProgress(lessonId: string, progress: number, c
         INSERT INTO progress (enrollment_id, lesson_id, progress, completed, last_accessed)
         VALUES ($1, $2, $3, $4, NOW())
       `,
-        [enrollmentId, numericLessonId, progress, completed],
-      )
+        [enrollmentId, numericLessonId, progress, completed]
+      );
     }
 
     // If the lesson is completed, check if all lessons in the course are completed
@@ -236,40 +257,42 @@ export async function updateLessonProgress(lessonId: string, progress: number, c
         FROM enrollments e
         WHERE e.id = $1
       `,
-        [enrollmentId],
-      )
+        [enrollmentId]
+      );
 
       if (courseCompletionCheck && courseCompletionCheck.length > 0) {
-        const { total_lessons, completed_lessons } = courseCompletionCheck[0]
+        const { total_lessons, completed_lessons } = courseCompletionCheck[0];
 
         // If all lessons are completed, mark the enrollment as completed
-        if (Number.parseInt(total_lessons) === Number.parseInt(completed_lessons)) {
+        if (
+          Number.parseInt(total_lessons) === Number.parseInt(completed_lessons)
+        ) {
           await executeQuery(
             `
             UPDATE enrollments
             SET completed_at = NOW()
             WHERE id = $1
           `,
-            [enrollmentId],
-          )
+            [enrollmentId]
+          );
         }
       }
     }
 
-    revalidatePath(`/academy/courses/[slug]/learn`)
-    return { success: true }
+    revalidatePath(`/academy/courses/[slug]/learn`);
+    return { success: true };
   } catch (error) {
-    console.error("Update lesson progress error:", error)
-    throw new Error("Failed to update lesson progress")
+    console.error("Update lesson progress error:", error);
+    throw new Error("Failed to update lesson progress");
   }
 }
 
 export async function saveNote(lessonId: string, content: string) {
   // Use our custom auth system instead of NextAuth
-  const user = requireAuth()
+  const user = await requireAuth();
 
   // Extract numeric lesson ID
-  const numericLessonId = extractNumericId(lessonId)
+  const numericLessonId = extractNumericId(lessonId);
 
   try {
     // Check if note exists
@@ -279,8 +302,8 @@ export async function saveNote(lessonId: string, content: string) {
       WHERE user_id = $1 AND lesson_id = $2
       LIMIT 1
     `,
-      [user.id, numericLessonId],
-    )
+      [user.id, numericLessonId]
+    );
 
     if (noteCheck && noteCheck.length > 0) {
       // Update existing note
@@ -290,8 +313,8 @@ export async function saveNote(lessonId: string, content: string) {
         SET content = $1, updated_at = NOW()
         WHERE user_id = $2 AND lesson_id = $3
       `,
-        [content, user.id, numericLessonId],
-      )
+        [content, user.id, numericLessonId]
+      );
     } else {
       // Create new note
       await executeQuery(
@@ -299,28 +322,28 @@ export async function saveNote(lessonId: string, content: string) {
         INSERT INTO notes (content, user_id, lesson_id, created_at, updated_at)
         VALUES ($1, $2, $3, NOW(), NOW())
       `,
-        [content, user.id, numericLessonId],
-      )
+        [content, user.id, numericLessonId]
+      );
     }
 
-    revalidatePath(`/academy/courses/[slug]/learn`)
-    return { success: true }
+    revalidatePath(`/academy/courses/[slug]/learn`);
+    return { success: true };
   } catch (error) {
-    console.error("Save note error:", error)
-    throw new Error("Failed to save note")
+    console.error("Save note error:", error);
+    throw new Error("Failed to save note");
   }
 }
 
 export async function getNote(lessonId: string) {
   // Use our custom auth system instead of NextAuth
-  const user = getServerUser()
+  const user = await getServerUser();
 
   if (!user) {
-    throw new Error("Not authenticated")
+    throw new Error("Not authenticated");
   }
 
   // Extract numeric lesson ID
-  const numericLessonId = extractNumericId(lessonId)
+  const numericLessonId = extractNumericId(lessonId);
 
   try {
     // Fetch note from database
@@ -331,32 +354,35 @@ export async function getNote(lessonId: string) {
       WHERE user_id = $1 AND lesson_id = $2
       LIMIT 1
     `,
-      [user.id, numericLessonId],
-    )
+      [user.id, numericLessonId]
+    );
 
     if (notes && notes.length > 0) {
-      return notes[0]
+      return notes[0];
     }
 
-    return null
+    return null;
   } catch (error) {
-    console.error("Get note error:", error)
-    return null
+    console.error("Get note error:", error);
+    return null;
   }
 }
 
-export async function submitQuiz(lessonId: string, answers: Record<string, string>) {
-  const user = requireAuth()
+export async function submitQuiz(
+  lessonId: string,
+  answers: Record<string, string>
+) {
+  const user = await requireAuth();
 
   // Extract numeric lesson ID
-  const numericLessonId = extractNumericId(lessonId)
+  const numericLessonId = extractNumericId(lessonId);
 
   try {
     // In a real app, you would validate the answers against correct answers
     // For now, we'll just calculate a mock score
-    const totalQuestions = Object.keys(answers).length
-    const correctAnswers = Math.floor(Math.random() * (totalQuestions + 1)) // Random score for demo
-    const score = Math.round((correctAnswers / totalQuestions) * 100)
+    const totalQuestions = Object.keys(answers).length;
+    const correctAnswers = Math.floor(Math.random() * (totalQuestions + 1)); // Random score for demo
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
 
     // Check if response exists
     const responseCheck = await executeQuery(
@@ -365,8 +391,8 @@ export async function submitQuiz(lessonId: string, answers: Record<string, strin
       WHERE user_id = $1 AND lesson_id = $2
       LIMIT 1
     `,
-      [user.id, numericLessonId],
-    )
+      [user.id, numericLessonId]
+    );
 
     if (responseCheck && responseCheck.length > 0) {
       // Update existing response
@@ -376,8 +402,8 @@ export async function submitQuiz(lessonId: string, answers: Record<string, strin
         SET answers = $1, score = $2, completed = true, updated_at = NOW()
         WHERE user_id = $3 AND lesson_id = $4
       `,
-        [JSON.stringify(answers), score, user.id, numericLessonId],
-      )
+        [JSON.stringify(answers), score, user.id, numericLessonId]
+      );
     } else {
       // Create new response
       await executeQuery(
@@ -385,29 +411,29 @@ export async function submitQuiz(lessonId: string, answers: Record<string, strin
         INSERT INTO quiz_responses (user_id, lesson_id, answers, score, completed, created_at, updated_at)
         VALUES ($1, $2, $3, $4, true, NOW(), NOW())
       `,
-        [user.id, numericLessonId, JSON.stringify(answers), score],
-      )
+        [user.id, numericLessonId, JSON.stringify(answers), score]
+      );
     }
 
     // Mark the lesson as completed
-    await updateLessonProgress(lessonId, 100, true)
+    await updateLessonProgress(lessonId, 100, true);
 
-    return { success: true, score }
+    return { success: true, score };
   } catch (error) {
-    console.error("Submit quiz error:", error)
-    throw new Error("Failed to submit quiz")
+    console.error("Submit quiz error:", error);
+    throw new Error("Failed to submit quiz");
   }
 }
 
 export async function getQuizResponse(lessonId: string) {
-  const user = getServerUser()
+  const user = await getServerUser();
 
   if (!user) {
-    throw new Error("Not authenticated")
+    throw new Error("Not authenticated");
   }
 
   // Extract numeric lesson ID
-  const numericLessonId = extractNumericId(lessonId)
+  const numericLessonId = extractNumericId(lessonId);
 
   try {
     // Fetch quiz response from database
@@ -418,19 +444,19 @@ export async function getQuizResponse(lessonId: string) {
       WHERE user_id = $1 AND lesson_id = $2
       LIMIT 1
     `,
-      [user.id, numericLessonId],
-    )
+      [user.id, numericLessonId]
+    );
 
     if (responses && responses.length > 0) {
       return {
         ...responses[0],
         answers: JSON.parse(responses[0].answers),
-      }
+      };
     }
 
-    return null
+    return null;
   } catch (error) {
-    console.error("Get quiz response error:", error)
-    return null
+    console.error("Get quiz response error:", error);
+    return null;
   }
 }

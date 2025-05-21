@@ -55,6 +55,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -68,6 +69,16 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.gradient-bg {
+  background: linear-gradient(100deg, rgba(255, 255, 255, 1) 0%, rgba(243, 232, 251, 1) 100%);
+}
+
+.clip-path-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
 }

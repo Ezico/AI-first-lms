@@ -14,7 +14,6 @@ import {
 
 export default async function AcademyPage() {
   // Fetch courses from the database
-  const featuredCourses = await getFeaturedCourses();
   const allCourses = await getAllCourses();
 
   return (

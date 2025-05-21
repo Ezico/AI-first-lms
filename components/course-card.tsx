@@ -1,29 +1,39 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { Star, Clock, Users, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import type { Course } from "@/lib/actions/course-actions"
+import Image from "next/image";
+import Link from "next/link";
+import { Star, Clock, Users, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { Course } from "@/lib/actions/course-actions";
 
 interface CourseCardProps {
-  course: Course
-  compact?: boolean
+  course: Course;
+  compact?: boolean;
 }
 
-export default function CourseCard({ course, compact = false }: CourseCardProps) {
+export default function CourseCard({
+  course,
+  compact = false,
+}: CourseCardProps) {
   // Default values for rating and enrolled if they're undefined
-  const rating = course.rating || 4.5
-  const enrolled = course.enrolled || 0
-
+  const rating = course.rating || 4.5;
+  const enrolled = course.enrolled || 0;
+  console.log(course);
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
       <div className="relative h-48 w-full">
-        <Image src={course.image || "/placeholder.svg"} alt={course.title} fill className="object-cover" />
+        <Image
+          src={course.image || "/placeholder.svg"}
+          alt={course.title}
+          fill
+          className="object-cover"
+        />
         {course.featured && !compact && (
           <div className="absolute top-4 right-4">
-            <Badge className="bg-purple-700 hover:bg-purple-800">Featured</Badge>
+            <Badge className="bg-purple-700 hover:bg-purple-800">
+              Featured
+            </Badge>
           </div>
         )}
       </div>
@@ -58,12 +68,16 @@ export default function CourseCard({ course, compact = false }: CourseCardProps)
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"}`}
+                  className={`h-4 w-4 ${
+                    i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"
+                  }`}
                   fill={i < Math.floor(rating) ? "currentColor" : "none"}
                 />
               ))}
             </div>
-            <span className="text-sm text-gray-600 ml-1">{rating.toFixed(1)}</span>
+            <span className="text-sm text-gray-600 ml-1">
+              {rating.toFixed(1)}
+            </span>
           </div>
           <div className="flex items-center text-sm text-gray-600">
             <Users className="h-4 w-4 mr-1" />
@@ -82,7 +96,9 @@ export default function CourseCard({ course, compact = false }: CourseCardProps)
             <Button
               variant={compact ? "outline" : "default"}
               className={
-                compact ? "border-purple-700 text-purple-700 hover:bg-purple-50" : "bg-purple-700 hover:bg-purple-800"
+                compact
+                  ? "border-purple-700 text-purple-700 hover:bg-purple-50"
+                  : "bg-purple-700 hover:bg-purple-800"
               }
             >
               {compact ? (
@@ -97,5 +113,5 @@ export default function CourseCard({ course, compact = false }: CourseCardProps)
         </div>
       </div>
     </div>
-  )
+  );
 }

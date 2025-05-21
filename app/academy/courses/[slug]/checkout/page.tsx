@@ -1,24 +1,33 @@
-import { notFound, redirect } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { requireAuth } from "@/lib/auth-utils"
-import { executeQuery } from "@/lib/db"
-import { enrollInCourse } from "@/lib/actions/enrollment"
+import { notFound, redirect } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { requireAuth } from "@/lib/auth-utils";
+import { executeQuery } from "@/lib/db";
+import { enrollInCourse } from "@/lib/actions/enrollment";
 
 interface CheckoutPageProps {
   params: {
-    slug: string
-  }
+    slug: string;
+  };
 }
 
 export default async function CheckoutPage({ params }: CheckoutPageProps) {
   // Require authentication
-  const user = requireAuth("/auth/signin?callbackUrl=/academy/courses/" + params.slug + "/checkout")
+  const user = await requireAuth(
+    "/auth/signin?callbackUrl=/academy/courses/" + params.slug + "/checkout"
+  );
 
   // Get the course
   const courses = await executeQuery(
@@ -28,14 +37,14 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     WHERE slug = $1
     LIMIT 1
   `,
-    [params.slug],
-  )
+    [params.slug]
+  );
 
   if (!courses || courses.length === 0) {
-    notFound()
+    notFound();
   }
 
-  const course = courses[0]
+  const course = courses[0];
 
   // Check if user is already enrolled
   const enrollments = await executeQuery(
@@ -45,27 +54,29 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     WHERE user_id = $1 AND course_id = $2
     LIMIT 1
   `,
-    [user.id, course.id],
-  )
+    [user.id, course.id]
+  );
 
   if (enrollments && enrollments.length > 0) {
-    redirect(`/academy/courses/${params.slug}/learn`)
+    redirect(`/academy/courses/${params.slug}/learn`);
   }
 
   // Handle enrollment
   async function handleEnrollment(formData: FormData) {
-    "use server"
+    "use server";
 
     // In a real app, you would process the payment here
     // For now, we'll just enroll the user
-    const result = await enrollInCourse(course.id, "pi_mock_payment_intent_id")
+    const result = await enrollInCourse(course.id, "pi_mock_payment_intent_id");
 
     if (result.success) {
-      redirect(`/academy/courses/${params.slug}/success`)
+      redirect(`/academy/courses/${params.slug}/success`);
     } else {
       // Handle error
-      console.error("Enrollment failed:", result)
-      redirect(`/academy/courses/${params.slug}/checkout?error=enrollment_failed`)
+      console.error("Enrollment failed:", result);
+      redirect(
+        `/academy/courses/${params.slug}/checkout?error=enrollment_failed`
+      );
     }
   }
 
@@ -74,7 +85,10 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <Link href={`/academy/courses/${params.slug}`} className="text-purple-700 hover:underline">
+            <Link
+              href={`/academy/courses/${params.slug}`}
+              className="text-purple-700 hover:underline"
+            >
               &larr; Back to course
             </Link>
           </div>
@@ -85,26 +99,46 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
               <Card>
                 <CardHeader>
                   <CardTitle>Complete Your Purchase</CardTitle>
-                  <CardDescription>Enter your payment details to enroll in this course</CardDescription>
+                  <CardDescription>
+                    Enter your payment details to enroll in this course
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form action={handleEnrollment}>
                     <div className="space-y-6">
                       {/* Personal Information */}
                       <div>
-                        <h3 className="text-lg font-medium mb-4">Personal Information</h3>
+                        <h3 className="text-lg font-medium mb-4">
+                          Personal Information
+                        </h3>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="col-span-2 sm:col-span-1">
                             <Label htmlFor="first-name">First Name</Label>
-                            <Input id="first-name" defaultValue={user.name.split(" ")[0]} required />
+                            <Input
+                              id="first-name"
+                              defaultValue={user.name.split(" ")[0]}
+                              required
+                            />
                           </div>
                           <div className="col-span-2 sm:col-span-1">
                             <Label htmlFor="last-name">Last Name</Label>
-                            <Input id="last-name" defaultValue={user.name.split(" ").slice(1).join(" ")} required />
+                            <Input
+                              id="last-name"
+                              defaultValue={user.name
+                                .split(" ")
+                                .slice(1)
+                                .join(" ")}
+                              required
+                            />
                           </div>
                           <div className="col-span-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" defaultValue={user.email} required />
+                            <Input
+                              id="email"
+                              type="email"
+                              defaultValue={user.email}
+                              required
+                            />
                           </div>
                         </div>
                       </div>
@@ -113,23 +147,38 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
                       {/* Payment Information */}
                       <div>
-                        <h3 className="text-lg font-medium mb-4">Payment Information</h3>
+                        <h3 className="text-lg font-medium mb-4">
+                          Payment Information
+                        </h3>
                         <div className="space-y-4">
                           <div>
                             <Label htmlFor="card-number">Card Number</Label>
-                            <Input id="card-number" placeholder="4242 4242 4242 4242" required />
+                            <Input
+                              id="card-number"
+                              placeholder="4242 4242 4242 4242"
+                              required
+                            />
                             <p className="text-xs text-gray-500 mt-1">
-                              For testing, use 4242 4242 4242 4242 with any future date and any CVC
+                              For testing, use 4242 4242 4242 4242 with any
+                              future date and any CVC
                             </p>
                           </div>
                           <div className="grid grid-cols-3 gap-4">
                             <div className="col-span-1">
                               <Label htmlFor="expiry-month">Month</Label>
-                              <Input id="expiry-month" placeholder="MM" required />
+                              <Input
+                                id="expiry-month"
+                                placeholder="MM"
+                                required
+                              />
                             </div>
                             <div className="col-span-1">
                               <Label htmlFor="expiry-year">Year</Label>
-                              <Input id="expiry-year" placeholder="YY" required />
+                              <Input
+                                id="expiry-year"
+                                placeholder="YY"
+                                required
+                              />
                             </div>
                             <div className="col-span-1">
                               <Label htmlFor="cvc">CVC</Label>
@@ -142,14 +191,37 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                       <div className="flex justify-between items-center pt-4">
                         <div className="text-sm text-gray-500">
                           <div className="flex items-center space-x-2 mb-1">
-                            <Image src="/visa-logo.png" alt="Visa" width={32} height={10} />
-                            <Image src="/mastercard-logo.png" alt="Mastercard" width={32} height={20} />
-                            <Image src="/amex-logo.png" alt="American Express" width={32} height={20} />
-                            <Image src="/paypal-logo.png" alt="PayPal" width={32} height={20} />
+                            <Image
+                              src="/visa-logo.png"
+                              alt="Visa"
+                              width={32}
+                              height={10}
+                            />
+                            <Image
+                              src="/mastercard-logo.png"
+                              alt="Mastercard"
+                              width={32}
+                              height={20}
+                            />
+                            <Image
+                              src="/amex-logo.png"
+                              alt="American Express"
+                              width={32}
+                              height={20}
+                            />
+                            <Image
+                              src="/paypal-logo.png"
+                              alt="PayPal"
+                              width={32}
+                              height={20}
+                            />
                           </div>
                           <p>Your payment information is secure</p>
                         </div>
-                        <Button type="submit" className="bg-purple-700 hover:bg-purple-800">
+                        <Button
+                          type="submit"
+                          className="bg-purple-700 hover:bg-purple-800"
+                        >
                           Complete Purchase
                         </Button>
                       </div>
@@ -177,7 +249,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                     </div>
                     <div>
                       <h3 className="font-medium">{course.title}</h3>
-                      <p className="text-sm text-gray-500">By {course.instructor}</p>
+                      <p className="text-sm text-gray-500">
+                        By {course.instructor}
+                      </p>
                     </div>
                   </div>
 
@@ -202,5 +276,5 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

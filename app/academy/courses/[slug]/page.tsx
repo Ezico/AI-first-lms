@@ -7,10 +7,10 @@ import { Star, Clock, Users, CheckCircle, BookOpen, Award } from "lucide-react";
 import MainNavigation from "@/components/main-navigation";
 import MainFooter from "@/components/main-footer";
 import { Reveal } from "@/components/reveal";
-import { getServerUser } from "@/lib/auth-utils";
 import { getCourseBySlug, getAllCourses } from "@/lib/actions/course-actions";
 import { getModulesForCourse } from "@/lib/actions/module-actions";
 import { isUserEnrolled } from "@/lib/actions/enrollment";
+import getServerUser from "@/lib/actions/getUserFunction";
 
 interface CoursePageProps {
   params: {
@@ -20,7 +20,7 @@ interface CoursePageProps {
 
 export default async function CoursePage({ params }: CoursePageProps) {
   // Use our custom auth system instead of NextAuth
-  const user = getServerUser();
+  const user = await getServerUser();
 
   // Find the course by slug from the database
   const course = await getCourseBySlug(params.slug);

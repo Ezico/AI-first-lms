@@ -1,11 +1,10 @@
-import { requireAuth } from "@/lib/auth-utils"
-import ProfileSettings from "@/components/profile/profile-settings"
-import MainNavigation from "@/components/main-navigation"
-import MainFooter from "@/components/main-footer"
+import { requireAuth } from "@/lib/auth-utils";
+import ProfileSettings from "@/components/profile/profile-settings";
+import MainNavigation from "@/components/main-navigation";
+import MainFooter from "@/components/main-footer";
 
 export default async function ProfilePage() {
-  const user = requireAuth()
-
+  const user = await requireAuth();
   return (
     <div className="flex min-h-screen flex-col">
       <MainNavigation />
@@ -16,5 +15,5 @@ export default async function ProfilePage() {
       </div>
       <MainFooter />
     </div>
-  )
+  );
 }
