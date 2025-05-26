@@ -5,7 +5,7 @@ export default function MainFooter() {
   return (
     <footer className=" bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center mb-4">
               <div className="bg-purple-700 text-white p-2 rounded mr-2">
@@ -83,7 +83,7 @@ export default function MainFooter() {
             </ul>
           </div>
 
-          <div>
+          {/* <div>
             <h3 className="font-bold text-lg mb-4">Resources</h3>
             <ul className="space-y-2">
               <li>
@@ -119,22 +119,22 @@ export default function MainFooter() {
                 </a>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           <div>
             <h3 className="font-bold text-lg mb-4">Contact</h3>
             <ul className="space-y-2">
-              <li>
+              {/* <li>
                 <a
-                  href="#"
+                  href="/about-us"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   About Us
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a
-                  href="#"
+                  href="/contact"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Contact
@@ -142,7 +142,7 @@ export default function MainFooter() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/privacy-policy"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Privacy Policy
@@ -150,7 +150,7 @@ export default function MainFooter() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/terms-of-service"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Terms of Service

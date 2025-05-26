@@ -11,7 +11,7 @@ import { getCourseBySlug, getAllCourses } from "@/lib/actions/course-actions";
 import { getModulesForCourse } from "@/lib/actions/module-actions";
 import { isUserEnrolled } from "@/lib/actions/enrollment";
 import getServerUser from "@/lib/actions/getUserFunction";
-
+import truncate from "html-truncate";
 interface CoursePageProps {
   params: {
     slug: string;
@@ -36,8 +36,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
         ? JSON.parse(course.category)
         : [course.category]
       : course.category
-      ? [course.category]
-      : [];
+        ? [course.category]
+        : [];
 
   const topics =
     typeof course.topics === "string"
@@ -45,8 +45,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
         ? JSON.parse(course.topics)
         : [course.topics]
       : course.topics
-      ? [course.topics]
-      : [];
+        ? [course.topics]
+        : [];
 
   // Check if user is enrolled
   const isEnrolled = user ? await isUserEnrolled(user.id, course.id) : false;
@@ -56,6 +56,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
   // Get related courses (same category, excluding current course)
   const allCourses = await getAllCourses();
+  const snippet = truncate(course.description, 250);
   const relatedCourses = allCourses
     .filter(
       (c) =>
@@ -89,7 +90,11 @@ export default async function CoursePage({ params }: CoursePageProps) {
                   {course.title}
                 </h1>
                 <p className="text-lg text-purple-100 mb-6">
-                  {course.description.substring(0, 500)}...
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: snippet,
+                    }}
+                  />
                 </p>
 
                 <div className="flex flex-wrap items-center gap-6 mb-6">
@@ -232,7 +237,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
                         <span>
                           {modules.length} modules,{" "}
                           {modules.reduce(
-                            (acc, module) => acc + module.lesson_count,
+                            (acc, module) =>
+                              acc + Number.parseInt(module.lesson_count),
                             0
                           )}{" "}
                           lessons
@@ -281,7 +287,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
               What You'll Learn
             </h2>
             <div className="grid md:grid-cols-2 gap-4 mb-12">
@@ -293,15 +299,16 @@ export default async function CoursePage({ params }: CoursePageProps) {
               ))}
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
               Course Content
             </h2>
+
             <div className="border border-gray-200 rounded-lg mb-12">
-              <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+              <div className="p-6 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                 <span className="font-medium">
                   {modules.length} modules •{" "}
                   {modules.reduce(
-                    (acc, module) => acc + module.lesson_count,
+                    (acc, module) => acc + Number.parseInt(module.lesson_count),
                     0
                   )}{" "}
                   lessons • {course.duration} total
@@ -314,7 +321,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
               {/* Display actual modules from database */}
               <div className="divide-y divide-gray-200">
                 {modules.map((module, index) => (
-                  <div key={module.id} className="p-4">
+                  <div key={module.id} className="p-7">
                     <div className="flex justify-between items-center cursor-pointer">
                       <h3 className="font-medium">
                         {index + 1}. {module.title}
@@ -339,14 +346,14 @@ export default async function CoursePage({ params }: CoursePageProps) {
               <li>Leadership role or aspiration</li>
             </ul> */}
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
               Description
             </h2>
-            <div className="prose max-w-none mb-12">
-              <p>{course.description}</p>
+            <div className="prose big-titles max-w-none mb-12">
+              <div dangerouslySetInnerHTML={{ __html: course.description }} />
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
               Your Instructor
             </h2>
             <div className="flex items-start mb-12">
@@ -395,7 +402,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
       {/* Related Courses */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Related Courses
           </h2>
           <div className="grid md:grid-cols-3 gap-8">

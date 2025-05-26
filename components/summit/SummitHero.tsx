@@ -26,40 +26,53 @@ import {
 } from "@/components/ui/form";
 import { Check } from "lucide-react";
 
-const waitlistSchema = z.object({
-  fullName: z.string().min(2, "Full name is required"),
-  email: z.string().email("Valid email is required"),
-  company: z.string().min(2, "Company name is required"),
-  jobTitle: z.string().min(2, "Job title is required"),
-  industry: z.string().min(2, "Please select your industry"),
-  interests: z.string().optional(),
-  referral: z.string().optional(),
-});
-
-type WaitlistFormData = z.infer<typeof waitlistSchema>;
-
 const WaitlistForm: React.FC = () => {
-  const { toast } = useToast();
+  const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const form = useForm<WaitlistFormData>({
-    resolver: zodResolver(waitlistSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      company: "",
-      jobTitle: "",
-      industry: "",
-      interests: "",
-      referral: "",
-    },
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    company: "",
+    jobTitle: "",
+    industry: "",
+    interests: "",
+    referral: "",
   });
 
-  const onSubmit = async (data: WaitlistFormData) => {
+  const handleSubmit = async (e) => {
     setIsSubmitting(true);
+    e.preventDefault();
+    // Make an API call to save submission and send ebook
+    const res = await fetch("/api/auth/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setStatus(data.message);
+      setForm({
+        fullName: "",
+        email: "",
+        company: "",
+        jobTitle: "",
+        industry: "",
+        interests: "",
+        referral: "",
+      }); // reset form
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    } else {
+      setStatus(data.message);
+      setIsSubmitted(false);
+      setIsSubmitting(false);
+    }
+
     // try {
-    //   await apiRequest("POST", "/api/summit/waitlist", data);
+    //   await apiRequest("POST", "/api/waitlist", data);
     //   toast({
     //     title: "Waitlist Registration Successful",
     //     description: "You'll be notified when registration opens.",
@@ -75,6 +88,10 @@ const WaitlistForm: React.FC = () => {
     // } finally {
     //   setIsSubmitting(false);
     // }
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const industries = [
@@ -138,151 +155,106 @@ const WaitlistForm: React.FC = () => {
         <CardTitle className="text-2xl">Join the Waitlist</CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Jane Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="jane.doe@company.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Company Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="jobTitle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Job Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="CTO, Director, etc." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="industry"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Industry</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your industry" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {industries.map((industry) => (
-                          <SelectItem key={industry} value={industry}>
-                            {industry}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="referral"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>How did you hear about us?</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="LinkedIn, Colleague, etc."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="interests"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>What topics are you most interested in?</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="AI strategy, implementation challenges, etc."
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This helps us tailor summit content to attendees' interests.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              name="fullName"
+              placeholder="Full Name"
+              required
+              value={form.fullName}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+            <Input
+              name="email"
+              type="email"
+              placeholder="Email"
+              required
+              value={form.email}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
             />
 
-            <Button
+            <Input
+              name="company"
+              placeholder="Company"
+              required
+              value={form.company}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+
+            {/* job title */}
+            <Input
+              placeholder="Job Title"
+              name="jobTitle"
+              value={form.jobTitle}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              required
+            />
+
+            <Select
+              onValueChange={(value) => setForm({ ...form, industry: value })}
+              defaultValue={form.industry}
+              required
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Industry" />
+              </SelectTrigger>
+              <SelectContent>
+                {industries.map((industry) => (
+                  <SelectItem key={industry} value={industry}>
+                    {industry}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* <input
+              name="industry"
+              placeholder="Industry"
+              required
+              value={form.industry}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            /> */}
+            <Input
+              name="interests"
+              placeholder="Interests (optional)"
+              value={form.interests}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+            <Input
+              name="referral"
+              placeholder="Referral (optional)"
+              value={form.referral}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+            <button
               type="submit"
-              className="w-full"
-              size="lg"
+              className="bg-primary text-white px-4 py-2 rounded"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Processing..." : "Join the Waitlist"}
-            </Button>
-
-            <p className="text-xs text-gray-500 text-center mt-4">
-              By joining the waitlist, you'll receive updates about the summit.
-              We respect your privacy and won't share your information.
+            </button>
+          </div>
+          {status && (
+            <p
+              className={`mt-4 text-center ${
+                isSubmitted ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {status}
             </p>
-          </form>
-        </Form>
+          )}
+        </form>
+        <p className="text-xs text-gray-500 text-center mt-4">
+          By joining the waitlist, you'll receive updates about the summit. We
+          respect your privacy and won't share your information.
+        </p>
       </CardContent>
     </Card>
   );

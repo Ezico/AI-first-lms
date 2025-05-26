@@ -140,7 +140,7 @@ export default async function AcademyPage() {
             {/* Course grid */}
             <div className="lg:w-full">
               {/* Search bar */}
-              <div className="relative mb-8">
+              {/* <div className="relative mb-8">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search className="w-5 h-5 text-gray-400" />
                 </div>
@@ -149,7 +149,7 @@ export default async function AcademyPage() {
                   className="block w-full p-4 pl-10 text-sm border border-gray-200 rounded-lg focus:ring-purple-500 focus:border-purple-500"
                   placeholder="Search courses..."
                 />
-              </div>
+              </div> */}
 
               <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {allCourses.length > 0 ? (
@@ -217,15 +217,9 @@ export default async function AcademyPage() {
               we can help you develop the AI skills needed for success.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-white text-purple-800 hover:bg-purple-50 px-8 py-6">
-                Request Information
-              </Button>
-              <Link href="/academy/enterprise">
-                <Button
-                  variant="outline"
-                  className="border-white text-white hover:bg-purple-600 px-8 py-6"
-                >
-                  Enterprise Solutions
+              <Link href="/contact">
+                <Button className="bg-white text-purple-800 hover:bg-purple-50 px-8 py-6">
+                  Request Information
                 </Button>
               </Link>
             </div>

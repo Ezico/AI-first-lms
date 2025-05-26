@@ -80,7 +80,7 @@ export default function Home() {
                   asChild
                 >
                   <Link
-                    href="/book"
+                    href="https://amazon.com"
                     className="flex items-center justify-center"
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" /> Order Now
@@ -215,15 +215,19 @@ export default function Home() {
               competitive, AI-centric organization.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-white text-purple-800 hover:bg-purple-50 px-8 py-6">
-                Get Started
-              </Button>
-              <Button
-                variant="outline"
-                className="border-white text-purple-800 hover:text-white hover:bg-purple-600 px-8 py-6"
-              >
-                Contact Us
-              </Button>
+              <Link href="/academy" className="flex items-center">
+                <Button className="bg-white text-purple-800 hover:bg-purple-50 px-8 py-6">
+                  Get Started
+                </Button>
+              </Link>
+              <Link href="/contact" className="flex items-center">
+                <Button
+                  variant="outline"
+                  className="border-white text-purple-800 hover:text-white hover:bg-purple-600 px-8 py-6"
+                >
+                  Contact Us
+                </Button>
+              </Link>
             </div>
           </Reveal>
         </div>

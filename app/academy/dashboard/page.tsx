@@ -1,6 +1,9 @@
 import { requireAuth } from "@/lib/auth-utils";
 import DashboardClient from "@/components/academy/dashboard-client";
-import { getUserEnrollments } from "@/lib/actions/enrollment";
+import {
+  getUserEnrollments,
+  getUserNotesWithCourseInfo,
+} from "@/lib/actions/enrollment";
 import { executeQuery } from "@/lib/db";
 
 export default async function DashboardPage() {
@@ -33,9 +36,12 @@ export default async function DashboardPage() {
     [user.id]
   );
 
+  const notes = await getUserNotesWithCourseInfo(user.id);
+
   return (
     <DashboardClient
       user={user}
+      notes={notes}
       enrollments={enrollments}
       recommendedCourses={recommendedCourses || []}
     />

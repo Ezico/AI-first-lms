@@ -1,7 +1,7 @@
-import type { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { executeQuery } from "@/lib/db"
-import { compare } from "bcrypt"
+import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { executeQuery } from "@/lib/db";
+import { compare } from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,26 +13,30 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          return null;
         }
 
         try {
           // Query the database for the user
-          const users = await executeQuery("SELECT id, name, email, password, role FROM users WHERE email = $1", [
-            credentials.email,
-          ])
+          const users = await executeQuery(
+            "SELECT id, name, email, password, role FROM users WHERE email = $1",
+            [credentials.email]
+          );
 
           if (users.length === 0) {
-            return null
+            return null;
           }
 
-          const user = users[0]
+          const user = users[0];
 
           // Verify password
-          const passwordMatch = await compare(credentials.password, user.password)
+          const passwordMatch = await compare(
+            credentials.password,
+            user.password
+          );
 
           if (!passwordMatch) {
-            return null
+            return null;
           }
 
           return {
@@ -40,10 +44,10 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             email: user.email,
             role: user.role,
-          }
+          };
         } catch (error) {
-          console.error("Auth error:", error)
-          return null
+          console.error("Auth error:", error);
+          return null;
         }
       },
     }),
@@ -58,19 +62,21 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
-        token.role = user.role
+        token.id = user.id;
+        token.role = user.role;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
-      return session
+      return session;
     },
   },
   debug: process.env.NODE_ENV === "development",
-  secret: process.env.NEXTAUTH_SECRET || "This-is-a-fallback-secret-and-should-be-changed",
-}
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    "This-is-a-fallback-secret-and-should-be-changed",
+};

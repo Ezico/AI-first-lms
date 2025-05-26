@@ -82,3 +82,85 @@
 .clip-path-bottom {
   clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
 }
+
+.ProseMirror {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 200px;
+  outline: none;
+}
+
+.editor-container {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-group select,
+.toolbar-group input[type="color"] {
+  padding: 4px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+button {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #eee;
+}
+
+.editor-body {
+  padding: 1rem;
+  min-height: 250px;
+}
+
+.prose h3,
+.prose h2,
+.prose h1,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.entry p,
+.entry h2,
+.entry li {
+  margin-bottom: 10px;
+}
+
+.entry h2 {
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.entry ul {
+  list-style: disc;
+  margin-left: 20px;
+}

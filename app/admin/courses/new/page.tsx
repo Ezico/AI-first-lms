@@ -5,7 +5,6 @@ import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -15,8 +14,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createCourse } from "@/lib/actions/course-actions";
+import dynamic from "next/dynamic";
+import { useState } from "react";
+const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), {
+  ssr: false,
+});
 
 export default function NewCoursePage() {
+  const [editorHtml, setEditorHtml] = useState("<p>Start writing...</p>");
+
   const handleSlugGeneration = () => {
     const titleInput = document.getElementById("title") as HTMLInputElement;
     const title = titleInput.value;
@@ -27,6 +33,8 @@ export default function NewCoursePage() {
       .replace(/\s+/g, "-");
     slugInput.value = slug;
   };
+
+  // const myInitialContent = `<h2>Course Description</h2>`;
 
   return (
     <div className="p-6 space-y-6">
@@ -77,7 +85,12 @@ export default function NewCoursePage() {
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" name="description" rows={4} required />
+              <TiptapEditor
+                name="description"
+                value={editorHtml}
+                onChange={(html) => setEditorHtml(html)}
+              />
+              {/* <Textarea id="description" name="description" rows={4} required /> */}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

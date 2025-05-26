@@ -450,7 +450,7 @@ export default function SummitPage() {
                 </div>
               </div>
 
-              <Tabs defaultValue="day1" className="mb-12">
+              <Tabs defaultValue="day1" className="mb-12" id="agenda">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-heading font-bold text-gray-900">
                     Summit Agenda

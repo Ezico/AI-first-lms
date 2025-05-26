@@ -4,62 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, Download, Mail } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-
-const downloadSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Valid email is required"),
-  company: z.string().min(2, "Company name is required"),
-});
-
-type DownloadFormData = z.infer<typeof downloadSchema>;
 
 const BookDetails: React.FC = () => {
-  const { toast } = useToast();
+  const [form, setForm] = useState({ name: "", company: "", email: "" });
+  const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<DownloadFormData>({
-    resolver: zodResolver(downloadSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      company: "",
-    },
-  });
+  const handleSubmit = async (e) => {
+    setIsSubmitting(true);
+    e.preventDefault();
+    // Make an API call to save submission and send ebook
+    const res = await fetch("/api/auth/ebook", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
 
-  const onSubmit = async () => {};
+    const data = await res.json();
 
-  //   const onSubmit = async (data: DownloadFormData) => {
-  //     setIsSubmitting(true);
-  //     try {
-  //       await apiRequest("POST", "/api/book/download", data);
-  //       toast({
-  //         title: "Request Successful",
-  //         description: "The free chapter has been sent to your email.",
-  //         variant: "default",
-  //       });
-  //       form.reset();
-  //     } catch (error) {
-  //       toast({
-  //         title: "Request Failed",
-  //         description: "Please try again later.",
-  //         variant: "destructive",
-  //       });
-  //     } finally {
-  //       setIsSubmitting(false);
-  //     }
-  //   };
+    if (data.success) {
+      setStatus(data.message);
+      setForm({ name: "", company: "", email: "" }); // reset form
+      setIsSubmitting(false);
+    } else {
+      setStatus(data.message);
+      setIsSubmitting(false);
+    }
+  };
 
   const tableOfContents = [
     "Strategic AI Transformation",
@@ -234,7 +206,62 @@ const BookDetails: React.FC = () => {
                   AI-centric organization.
                 </p>
 
-                <Form {...form}>
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-4 max-w-md mx-auto"
+                >
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Your Company"
+                    required
+                    value={form.company}
+                    onChange={(e) =>
+                      setForm({ ...form, company: e.target.value })
+                    }
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your Email"
+                    required
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                    className="w-full p-2 border rounded"
+                  />
+                  <Button
+                    variant="default"
+                    title="Send My Free Chapter"
+                    disabled={isSubmitting}
+                    type="submit"
+                    className="bg-primary w-full text-white px-4 py-2 rounded"
+                  >
+                    Send My Free Chapter
+                  </Button>
+
+                  {status && (
+                    <p
+                      className={`text-sm text-center mt-4 ${
+                        status.includes("success")
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {status}
+                    </p>
+                  )}
+                </form>
+
+                {/* <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-4"
@@ -305,7 +332,7 @@ const BookDetails: React.FC = () => {
                       )}
                     </Button>
                   </form>
-                </Form>
+                </Form> */}
 
                 <div className="mt-6 pt-6 border-t border-gray-200 text-sm text-gray-600">
                   <p>

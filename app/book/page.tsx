@@ -1,8 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Download, BookOpen, CheckCircle } from "lucide-react";
-import TestimonialCarousel from "@/components/testimonial-carousel";
-import TableOfContents from "@/components/table-of-contents";
 import { Reveal } from "@/components/reveal";
 import MainNavigation from "@/components/main-navigation";
 import MainFooter from "@/components/main-footer";

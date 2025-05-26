@@ -150,12 +150,12 @@ export async function createCourse(formData: FormData) {
 
     const result = await sql`
       INSERT INTO courses (
-        title, slug, description, level, duration, price, 
-        instructor, instructor_title, instructor_image, image, 
+        title, slug, description, level, duration, price,
+        instructor, instructor_title, instructor_image, image,
         category, topics, featured, published, created_at, updated_at
       ) VALUES (
-        ${title}, ${slug}, ${description}, ${level}, ${duration}, ${price}, 
-        ${instructor}, ${instructor_title}, ${instructor_image}, ${image}, 
+        ${title}, ${slug}, ${description}, ${level}, ${duration}, ${price},
+        ${instructor}, ${instructor_title}, ${instructor_image}, ${image},
         ${category}, ${topics}, ${featured}, ${published}, NOW(), NOW()
       ) RETURNING id
     `;

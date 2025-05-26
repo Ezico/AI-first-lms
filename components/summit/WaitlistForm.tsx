@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarClock, MapPin, Users, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
+import SummitCountdown from "./Countdowntimer";
 
 const SummitHero: React.FC = () => {
   return (
@@ -56,11 +57,11 @@ const SummitHero: React.FC = () => {
               </Button>
               <Button
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white/20"
+                className="border-2 border-white text-primary hover:bg-white/20"
                 size="lg"
                 asChild
               >
-                <Link href="/summit/agenda" className="flex items-center">
+                <Link href="#agenda" className="flex items-center">
                   <LinkIcon className="mr-2 h-4 w-4" /> View Agenda
                 </Link>
               </Button>
@@ -68,39 +69,7 @@ const SummitHero: React.FC = () => {
           </div>
 
           <div className="w-full lg:w-2/5 mt-12 lg:mt-0 flex justify-center">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md animation-fade-in-up">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Summit Countdown
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Reserve your spot before registration closes
-                </p>
-              </div>
-
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
-                  <div className="text-3xl font-bold text-primary">30</div>
-                  <div className="text-xs text-gray-500">Days</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
-                  <div className="text-3xl font-bold text-primary">12</div>
-                  <div className="text-xs text-gray-500">Hours</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
-                  <div className="text-3xl font-bold text-primary">45</div>
-                  <div className="text-xs text-gray-500">Mins</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
-                  <div className="text-3xl font-bold text-primary">30</div>
-                  <div className="text-xs text-gray-500">Secs</div>
-                </div>
-              </div>
-
-              <Button className="w-full" size="lg" asChild>
-                <a href="#waitlist">Join the Waitlist Now</a>
-              </Button>
-            </div>
+            <SummitCountdown />
           </div>
         </div>
       </div>

@@ -69,6 +69,7 @@ export default async function LearnPage({ params }: LearnPageProps) {
         l.id, 
         l.title, 
         l.type, 
+        l.content,
         l.duration, 
         l."order",
         p.completed,

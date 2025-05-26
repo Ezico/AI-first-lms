@@ -368,6 +368,59 @@ export async function getNote(lessonId: string) {
   }
 }
 
+export async function getUserNotesWithCourseInfo(userId: number) {
+  try {
+    const result = await sql`
+      SELECT
+        notes.id AS note_id,
+        notes.content AS note_content,
+        notes.created_at AS note_created_at,
+        
+        lessons.id AS lesson_id,
+        lessons.title AS lesson_title,
+        
+        modules.id AS module_id,
+        modules.title AS module_title,
+        
+        courses.id AS course_id,
+        courses.title AS course_title
+      
+      FROM notes
+      JOIN lessons ON notes.lesson_id = lessons.id
+      JOIN modules ON lessons.module_id = modules.id
+      JOIN courses ON modules.course_id = courses.id
+      WHERE notes.user_id = ${userId}
+      ORDER BY notes.created_at DESC
+    `;
+
+    return result;
+  } catch (error) {
+    console.error("Failed to fetch user notes:", error);
+    throw new Error("Could not load notes");
+  }
+}
+
+// get all notes for a user using id
+export async function getUserNotes(userId: number) {
+  try {
+    // Fetch all notes for the user
+    const notes = await executeQuery(
+      `
+      SELECT id, content, lesson_id, created_at, updated_at
+      FROM notes
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+    `,
+      [userId]
+    );
+
+    return notes || [];
+  } catch (error) {
+    console.error("Get user notes error:", error);
+    return [];
+  }
+}
+
 export async function submitQuiz(
   lessonId: string,
   answers: Record<string, string>

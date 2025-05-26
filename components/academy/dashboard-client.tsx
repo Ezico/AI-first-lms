@@ -11,33 +11,39 @@ import {
   BookOpen,
   Clock,
   Award,
-  BarChart,
-  Calendar,
   CheckCircle,
   ChevronRight,
   Download,
   FileText,
-  Play,
   Settings,
   LucideUser,
 } from "lucide-react";
 import MainNavigation from "@/components/main-navigation";
 import MainFooter from "@/components/main-footer";
 import type { User } from "@/lib/auth-context";
+// format time to day ago
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 interface DashboardClientProps {
   user: User;
+  notes: any[];
   enrollments: any[];
   recommendedCourses: any[];
 }
 
 export default function DashboardClient({
   user,
+  notes,
   enrollments,
   recommendedCourses,
 }: DashboardClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("my-courses");
+  const [currentPage, setCurrentPage] = useState(1);
+  const notesPerPage = 3;
 
   // Calculate overall progress across all courses
   const totalLessons = enrollments.reduce(
@@ -51,7 +57,13 @@ export default function DashboardClient({
   const overallProgress =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
-  // console.log(totalLessons, completedLessons, overallProgress);
+  // add pagination to notes
+  const paginatedNotes = notes.slice(
+    (currentPage - 1) * notesPerPage,
+    currentPage * notesPerPage
+  );
+  const totalPages = Math.ceil(notes.length / notesPerPage);
+
   return (
     <div className="flex min-h-screen flex-col">
       <MainNavigation />
@@ -307,89 +319,40 @@ export default function DashboardClient({
                     </h2>
 
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                      <div className="mb-6">
-                        <label
-                          htmlFor="course-filter"
-                          className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          Filter by Course
-                        </label>
-                        <select
-                          id="course-filter"
-                          className="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                        >
-                          <option value="">All Courses</option>
-                          {enrollments.map((course) => (
-                            <option key={course.id} value={course.id}>
-                              {course.title}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {enrollments.length > 0 ? (
+                      {paginatedNotes.length > 0 ? (
                         <div className="space-y-4">
-                          <div className="border border-gray-200 rounded-lg p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <h3 className="font-medium text-gray-900">
-                                  AI Leadership Fundamentals
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                  Lesson: Key Concepts and Terminology
-                                </p>
+                          {paginatedNotes.map((note) => (
+                            <div
+                              key={note.note_id}
+                              className="border border-gray-200 rounded-lg p-4"
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <h3 className="font-medium text-gray-900">
+                                    {note.course_title}
+                                  </h3>
+                                  <p className="text-sm text-gray-600">
+                                    Lesson: {note.lesson_title}
+                                  </p>
+                                </div>
+                                <span className="text-xs text-gray-500">
+                                  {dayjs(note.note_created_at).fromNow()}
+                                </span>
                               </div>
-                              <span className="text-xs text-gray-500">
-                                2 days ago
-                              </span>
-                            </div>
-                            <p className="text-gray-700 mb-3">
-                              Important to remember the difference between
-                              narrow AI and general AI. Narrow AI is designed
-                              for specific tasks while general AI would have
-                              broader capabilities across domains.
-                            </p>
-                            <div className="flex justify-end">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-purple-700 hover:bg-purple-50"
-                              >
-                                Edit
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="border border-gray-200 rounded-lg p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <h3 className="font-medium text-gray-900">
-                                  AI for Business Strategy
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                  Lesson: Identifying AI Opportunities
-                                </p>
+                              <p className="text-gray-700 mb-3">
+                                {note.note_content}
+                              </p>
+                              <div className="flex justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-purple-700 hover:bg-purple-50"
+                                >
+                                  Edit
+                                </Button>
                               </div>
-                              <span className="text-xs text-gray-500">
-                                1 week ago
-                              </span>
                             </div>
-                            <p className="text-gray-700 mb-3">
-                              Three key areas to look for AI opportunities:
-                              processes with repetitive tasks, areas with large
-                              amounts of data, and decision points that would
-                              benefit from prediction.
-                            </p>
-                            <div className="flex justify-end">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-purple-700 hover:bg-purple-50"
-                              >
-                                Edit
-                              </Button>
-                            </div>
-                          </div>
+                          ))}
                         </div>
                       ) : (
                         <div className="text-center py-8">
@@ -401,6 +364,33 @@ export default function DashboardClient({
                             You haven't taken any notes yet. Notes can be added
                             while watching lessons.
                           </p>
+                        </div>
+                      )}
+                      {totalPages > 1 && (
+                        <div className="flex justify-center items-center space-x-2 pt-4">
+                          <button
+                            onClick={() =>
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
+                            }
+                            className="px-3 py-1 border rounded-md text-sm hover:bg-gray-100 disabled:opacity-50"
+                            disabled={currentPage === 1}
+                          >
+                            Previous
+                          </button>
+                          <span className="text-sm text-gray-600">
+                            Page {currentPage} of {totalPages}
+                          </span>
+                          <button
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
+                            className="px-3 py-1 border rounded-md text-sm hover:bg-gray-100 disabled:opacity-50"
+                            disabled={currentPage === totalPages}
+                          >
+                            Next
+                          </button>
                         </div>
                       )}
                     </div>
