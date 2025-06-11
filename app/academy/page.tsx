@@ -1,11 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, ChevronRight, GraduationCap, Search } from "lucide-react";
+import {
+  CheckCircle,
+  ChevronRight,
+  Clock,
+  GraduationCap,
+  Search,
+  Star,
+  Users,
+} from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import MainNavigation from "@/components/main-navigation";
 import MainFooter from "@/components/main-footer";
 import CourseCard from "@/components/course-card";
+import { Badge } from "@/components/ui/badge";
 import CourseFilters from "@/components/course-filters";
 import {
   getAllCourses,
@@ -163,10 +172,177 @@ export default async function AcademyPage() {
                     </p>
                   </div>
                 )}
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
+                  <div className="relative h-48 w-full">
+                    <Image
+                      src={"/images/pm-course.png"}
+                      alt={""}
+                      fill
+                      className="object-cover"
+                    />
+
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-purple-700 hover:bg-purple-800">
+                        Featured
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-purple-700 bg-purple-50 px-3 py-1 rounded-full">
+                        Beginner
+                      </span>
+                      <span className="text-sm text-gray-500 flex items-center">
+                        <Clock className="h-4 w-4 mr-1" />8 weeks
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Launch Your Project Management Career with AI
+                    </h3>
+
+                    <div className="flex items-center mb-4">
+                      <div className="relative h-8 w-8 rounded-full overflow-hidden mr-2">
+                        <Image
+                          src={"/placeholder.svg"}
+                          alt={""}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <span className="text-sm text-gray-700">
+                        Davies Bamigboye
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(5)
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                              fill={i < Math.floor(5) ? "currentColor" : "none"}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600 ml-1">5.0</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Users className="h-4 w-4 mr-1" />0 students
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <div className="text-xl font-bold text-gray-900">
+                        From $499 to $899
+                      </div>
+                      <Link href={`/academy/project-management-course`}>
+                        <Button
+                          variant={"outline"}
+                          className={
+                            "border-purple-700 text-purple-700 hover:bg-purple-50"
+                          }
+                        >
+                          <span className="flex items-center">
+                            Details <ChevronRight className="ml-1 h-4 w-4" />
+                          </span>
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
+                  <div className="relative h-48 w-full">
+                    <Image
+                      src={"/images/delivery.png"}
+                      alt={""}
+                      fill
+                      className="object-cover"
+                    />
+
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-purple-700 hover:bg-purple-800">
+                        Featured
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-purple-700 bg-purple-50 px-3 py-1 rounded-full">
+                        Beginner
+                      </span>
+                      <span className="text-sm text-gray-500 flex items-center">
+                        <Clock className="h-4 w-4 mr-1" />8 weeks
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Deliver Smarter Projects with AI
+                    </h3>
+
+                    <div className="flex items-center mb-4">
+                      <div className="relative h-8 w-8 rounded-full overflow-hidden mr-2">
+                        <Image
+                          src={"/placeholder.svg"}
+                          alt={""}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <span className="text-sm text-gray-700">
+                        Davies Bamigboye
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(5)
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                              fill={i < Math.floor(5) ? "currentColor" : "none"}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600 ml-1">5.0</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Users className="h-4 w-4 mr-1" />0 students
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <div className="text-xl font-bold text-gray-900">
+                        From $799 to $2,499
+                      </div>
+                      <Link href={`/academy/deliver-smarter-project-with-ai`}>
+                        <Button
+                          variant={"outline"}
+                          className={
+                            "border-purple-700 text-purple-700 hover:bg-purple-50"
+                          }
+                        >
+                          <span className="flex items-center">
+                            Details <ChevronRight className="ml-1 h-4 w-4" />
+                          </span>
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Pagination */}
-              <div className="flex justify-center mt-12">
+              {/* <div className="flex justify-center mt-12">
                 <nav className="inline-flex rounded-md shadow">
                   <a
                     href="#"
@@ -199,7 +375,7 @@ export default async function AcademyPage() {
                     Next
                   </a>
                 </nav>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
