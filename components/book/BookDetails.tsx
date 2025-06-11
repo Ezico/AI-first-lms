@@ -151,9 +151,9 @@ const BookDetails: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
                   <div className="w-32 h-32 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&h=300"
+                      src={"/images/dav.jpeg"}
                       alt="Davies K. Bamigboye"
-                      className="w-full h-full object-cover"
+                      className="w-full "
                     />
                   </div>
                   <div>

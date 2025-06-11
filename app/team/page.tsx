@@ -3,6 +3,7 @@ import { Reveal } from "@/components/reveal";
 import MainNavigation from "@/components/main-navigation";
 import MainFooter from "@/components/main-footer";
 import TeamMemberCard from "@/components/team-member-card";
+import Link from "next/link";
 
 // Team data
 const leadershipTeam = [
@@ -346,9 +347,11 @@ export default function TeamPage() {
               and business transformation. Explore our current openings and join
               us in our mission.
             </p>
-            <Button className="bg-white text-purple-800 hover:bg-purple-50 px-8 py-6">
-              View Open Positions
-            </Button>
+            <Link href={"/contact"}>
+              <Button className="bg-white text-purple-800 hover:bg-purple-50 px-8 py-6">
+                Contact us
+              </Button>
+            </Link>
           </Reveal>
         </div>
       </section>

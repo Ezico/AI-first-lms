@@ -56,7 +56,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
   // Get related courses (same category, excluding current course)
   const allCourses = await getAllCourses();
-  const snippet = truncate(course.description, 250);
+  const snippet = truncate(course?.description, 250);
   const relatedCourses = allCourses
     .filter(
       (c) =>
@@ -350,7 +350,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
               Description
             </h2>
             <div className="prose big-titles max-w-none mb-12">
-              <div dangerouslySetInnerHTML={{ __html: course.description }} />
+              <div dangerouslySetInnerHTML={{ __html: course?.description }} />
             </div>
 
             <h2 className="text-3xl font-bold text-gray-900 mb-8">
@@ -425,7 +425,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
                       {relatedCourse.title}
                     </h3>
                     <p className="text-gray-600 text-sm mb-4">
-                      {relatedCourse.description.substring(0, 100)}...
+                      {relatedCourse?.description.substring(0, 100)}...
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">

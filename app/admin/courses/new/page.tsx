@@ -53,16 +53,12 @@ export default function NewCoursePage() {
         </CardHeader>
         <CardContent>
           <form action={createCourse} className="space-y-8">
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Course Title</Label>
                 <Input id="title" name="title" required />
               </div>
-              {/* <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
-                <Input id="slug" name="slug" required />
-                <p className="text-xs text-gray-500">URL-friendly name (e.g., "ai-leadership")</p>
-              </div> */}
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <Label htmlFor="slug">Slug</Label>
@@ -82,7 +78,6 @@ export default function NewCoursePage() {
                 </p>
               </div>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <TiptapEditor
@@ -90,9 +85,7 @@ export default function NewCoursePage() {
                 value={editorHtml}
                 onChange={(html) => setEditorHtml(html)}
               />
-              {/* <Textarea id="description" name="description" rows={4} required /> */}
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="level">Level</Label>
@@ -128,7 +121,6 @@ export default function NewCoursePage() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="instructor">Instructor Name</Label>
@@ -139,7 +131,6 @@ export default function NewCoursePage() {
                 <Input id="instructor_title" name="instructor_title" required />
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="instructor_image">Instructor Image URL</Label>
@@ -158,7 +149,6 @@ export default function NewCoursePage() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
@@ -185,7 +175,6 @@ export default function NewCoursePage() {
                 />
               </div>
             </div>
-
             <div className="flex flex-col space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox id="featured" name="featured" />
@@ -196,7 +185,6 @@ export default function NewCoursePage() {
                 <Label htmlFor="published">Published</Label>
               </div>
             </div>
-
             <div className="flex justify-end space-x-4">
               <Link href="/admin/courses">
                 <Button variant="outline">Cancel</Button>
@@ -208,6 +196,7 @@ export default function NewCoursePage() {
                 Create Course
               </Button>
             </div>
+            
           </form>
         </CardContent>
       </Card>

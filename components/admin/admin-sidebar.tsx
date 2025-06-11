@@ -7,7 +7,9 @@ import { useAuth } from "@/lib/auth-context";
 import {
   BarChart,
   BookOpen,
+  Contact2,
   FileText,
+  Group,
   LayoutDashboard,
   LogOut,
   Mic,
@@ -26,6 +28,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { FaFilePdf } from "react-icons/fa";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -74,6 +77,42 @@ export default function AdminSidebar() {
               <Link href="/admin/podcasts">
                 <Mic className="h-4 w-4 mr-3" />
                 <span>Podcasts</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive("/admin/contact-form")}
+            >
+              <Link href="/admin/contact-form">
+                <Contact2 className="h-4 w-4 mr-3" />
+                <span>Contacts</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive("/admin/ebook-downloads")}
+            >
+              <Link href="/admin/ebook-downloads">
+                <FaFilePdf className="h-4 w-4 mr-3" />
+                <span>Ebook Downloads</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive("/admin/waitlist-form")}
+            >
+              <Link href="/admin/waitlist-form">
+                <Group className="h-4 w-4 mr-3" />
+                <span>Summit Waitlist</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

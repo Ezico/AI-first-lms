@@ -7,6 +7,7 @@ import MainFooter from "@/components/main-footer";
 import BookDetails from "@/components/book/BookDetails";
 import AsSeenOn from "@/components/book/AsSeenOn";
 import Testimonials from "@/components/book/Testimonials";
+import Link from "next/link";
 
 export default function BookPage() {
   return (
@@ -64,17 +65,21 @@ export default function BookPage() {
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button className="bg-purple-700 hover:bg-purple-800 text-white px-6 py-6 rounded-lg transition-all hover:scale-105 shadow-lg">
-                    <Download className="mr-2 h-5 w-5" />
-                    Download Free Chapter
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-purple-700 text-purple-700 hover:bg-purple-50 px-6 py-6 rounded-lg transition-all"
-                  >
-                    <BookOpen className="mr-2 h-5 w-5" />
-                    Order Now
-                  </Button>
+                  <Link href={"#download-form"} className="w-full sm:w-auto">
+                    <Button className="bg-purple-700 hover:bg-purple-800 text-white px-6 py-6 rounded-lg transition-all hover:scale-105 shadow-lg">
+                      <Download className="mr-2 h-5 w-5" />
+                      Download Free Chapter
+                    </Button>
+                  </Link>
+                  <Link href="https://amazon.com" className="w-full sm:w-auto">
+                    <Button
+                      variant="outline"
+                      className="border-purple-700 text-purple-700 hover:bg-purple-50 px-6 py-6 rounded-lg transition-all"
+                    >
+                      <BookOpen className="mr-2 h-5 w-5" />
+                      Order Now
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Reveal>
@@ -114,10 +119,12 @@ export default function BookPage() {
                   executive summaries, implementation guides, and team
                   discussion materials.
                 </p>
-                <Button className="bg-purple-700 hover:bg-purple-800 text-white px-8 py-6 rounded-lg transition-all hover:scale-105 shadow-lg text-lg">
-                  Send My Corporate Preview
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Link href="#download-form" className="inline-block">
+                  <Button className="bg-purple-700 hover:bg-purple-800 text-white px-8 py-6 rounded-lg transition-all hover:scale-105 shadow-lg text-lg">
+                    Send My Corporate Preview
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </Reveal>
           </div>
