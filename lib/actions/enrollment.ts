@@ -4,8 +4,9 @@ import { requireAuth } from "@/lib/auth-utils";
 import { executeQuery } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { neon } from "@neondatabase/serverless";
-import { cookies } from "next/headers";
 import getServerUser from "./getUserFunction";
+import { InvoiceService } from "../services/invoice-service";
+import { retrievePaymentIntent } from "../services/stripe-service";
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -76,10 +77,7 @@ export async function enrollInCourse(
   try {
     // Check if user is already enrolled
     const existingEnrollment = await executeQuery(
-      `
-      SELECT id FROM enrollments
-      WHERE user_id = $1 AND course_id = $2
-    `,
+      `SELECT id FROM enrollments WHERE user_id = $1 AND course_id = $2`,
       [user.id, courseId]
     );
 
@@ -91,13 +89,30 @@ export async function enrollInCourse(
       };
     }
 
-    // Create new enrollment
+    // // If payment intent provided, verify payment
+    // if (paymentIntentId) {
+    //   const paymentIntent =
+    //     await retrievePaymentIntent(paymentIntentId);
+
+    //   if (paymentIntent.status !== "succeeded") {
+    //     throw new Error("Payment not completed");
+    //   }
+
+    //   // Update payment record
+    //   await sql`
+    //     UPDATE payments SET
+    //       status = ${paymentIntent.status},
+    //       enrollment_id = (
+    //         SELECT id FROM enrollments WHERE user_id = ${user.id} AND course_id = ${courseId} LIMIT 1
+    //       )
+    //     WHERE stripe_payment_intent_id = ${paymentIntentId}
+    //   `;
+    // }
+
+    // Create enrollment
     const enrollment = await executeQuery(
-      `
-      INSERT INTO enrollments (user_id, course_id, enrolled_at)
-      VALUES ($1, $2, NOW())
-      RETURNING id
-    `,
+      `INSERT INTO enrollments (user_id, course_id, enrolled_at)
+       VALUES ($1, $2, NOW()) RETURNING id`,
       [user.id, courseId]
     );
 
@@ -105,51 +120,116 @@ export async function enrollInCourse(
       throw new Error("Failed to create enrollment");
     }
 
-    // Get all lessons for this course
+    const enrollmentId = enrollment[0].id;
+
+    // Get course details for invoice
+    // const courses = await executeQuery(
+    //   `SELECT title, price FROM courses WHERE id = $1`,
+    //   [courseId]
+    // );
+
+    // if (courses && courses.length > 0) {
+    //   const course = courses[0];
+
+    //   // // Create invoice
+    //   // const invoiceId = await InvoiceService.createInvoice(
+    //   //   {
+    //   //     userId: user.id,
+    //   //     amount: Number.parseFloat(course.price),
+    //   //     courseId,
+    //   //   },
+    //   //   [
+    //   //     {
+    //   //       description: `Enrollment in ${course.title}`,
+    //   //       quantity: 1,
+    //   //       unitPrice: Number.parseFloat(course.price),
+    //   //       courseId,
+    //   //     },
+    //   //   ]
+    //   // );
+
+    //   // Mark invoice as paid if payment was successful
+    //   // if (paymentIntentId) {
+    //   //   const paymentResult = await sql`
+    //   //     SELECT id FROM payments WHERE stripe_payment_intent_id = ${paymentIntentId} LIMIT 1
+    //   //   `;
+
+    //   //   if (paymentResult.length > 0) {
+    //   //     await InvoiceService.markInvoiceAsPaid(
+    //   //       invoiceId,
+    //   //       paymentResult[0].id
+    //   //     );
+
+    //   //     // Send payment confirmation email
+    //   //     await sendEmail({
+    //   //       to: user.email,
+    //   //       templateType: "payment_confirmation",
+    //   //       variables: {
+    //   //         userName: user.name,
+    //   //         courseName: course.title,
+    //   //         amount: course.price,
+    //   //         paymentDate: new Date().toLocaleDateString(),
+    //   //         invoiceNumber: `INV-${invoiceId}`,
+    //   //         dashboardUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/academy/dashboard`,
+    //   //       },
+    //   //     });
+    //   //   }
+    //   // }
+    // }
+
+    // Create initial progress records for all lessons
     const lessons = await executeQuery(
-      `
-      SELECT l.id
-      FROM lessons l
-      JOIN modules m ON l.module_id = m.id
-      WHERE m.course_id = $1
-      ORDER BY m.order, l.order
-    `,
+      `SELECT l.id FROM lessons l
+       JOIN modules m ON l.module_id = m.id
+       WHERE m.course_id = $1 ORDER BY m.order, l.order`,
       [courseId]
     );
 
-    // Create initial progress records for all lessons
     if (lessons && lessons.length > 0) {
       for (const lesson of lessons) {
         await executeQuery(
-          `
-          INSERT INTO progress (enrollment_id, lesson_id, completed, progress, last_accessed)
-          VALUES ($1, $2, false, 0, NOW())
-        `,
-          [enrollment[0].id, lesson.id]
+          `INSERT INTO progress (enrollment_id, lesson_id, completed, progress, last_accessed)
+           VALUES ($1, $2, false, 0, NOW())`,
+          [enrollmentId, lesson.id]
         );
       }
     }
 
-    // If payment intent provided, save it (in a real app)
-    if (paymentIntentId) {
-      // In a real app, you would save the payment intent ID
-      console.log(
-        `Payment intent ${paymentIntentId} for enrollment ${enrollment[0].id}`
-      );
-    }
-
     revalidatePath("/academy/dashboard");
-    return { success: true, enrollmentId: enrollment[0].id };
+    return { success: true, enrollmentId };
   } catch (error) {
     console.error("Enrollment error:", error);
     throw new Error("Failed to enroll in course");
   }
 }
 
+export async function getUserPurchasedCourse() {
+  // Use our custom auth system instead of NextAuth
+  const user = await requireAuth();
+  if (!user) {
+    return [];
+  }
+
+  try {
+    // Fetch user enrollments from the database
+    const purchases = await sql`
+    SELECT s.*, p.createdat
+    FROM "SimpleCoursePurchase" p
+    JOIN "SimpleCourse" s ON p.courseid = s.id
+    WHERE p.userid = ${user.id}
+    ORDER BY p.createdat DESC;
+  `;
+
+    return purchases || [];
+  } catch (error) {
+    console.error("Get user enrollments error:", error);
+    return [];
+  }
+}
+
 export async function getUserEnrollments() {
   // Use our custom auth system instead of NextAuth
-  const user = await getServerUser();
-
+  const user = await requireAuth();
   if (!user) {
     return [];
   }

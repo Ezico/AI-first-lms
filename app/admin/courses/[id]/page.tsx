@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { notFound, useSearchParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { getCourseById } from "@/lib/actions/course-actions";
 import CourseEditForm from "@/components/admin/course-edit-form";
-import { use, useEffect } from "react";
 
 export default async function EditCoursePage({
   params,

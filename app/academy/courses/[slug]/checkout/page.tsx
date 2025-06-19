@@ -1,7 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,20 +9,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { requireAuth } from "@/lib/auth-utils";
 import { executeQuery } from "@/lib/db";
-import { enrollInCourse } from "@/lib/actions/enrollment";
+import { createCourseCheckoutSession } from "@/lib/actions/stripe-checkout-actions";
+import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { Suspense } from "react";
+import { AlertCircle, CreditCard, Shield, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface CheckoutPageProps {
   params: {
     slug: string;
   };
+  searchParams: {
+    canceled?: string;
+    error?: string;
+  };
 }
 
-export default async function CheckoutPage({ params }: CheckoutPageProps) {
+export default async function CheckoutPage({
+  params,
+  searchParams,
+}: CheckoutPageProps) {
   // Require authentication
   const user = await requireAuth(
     "/auth/signin?callbackUrl=/academy/courses/" + params.slug + "/checkout"
@@ -31,12 +40,8 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   // Get the course
   const courses = await executeQuery(
-    `
-    SELECT id, title, price, image, instructor, instructor_image
-    FROM courses
-    WHERE slug = $1
-    LIMIT 1
-  `,
+    `SELECT id, title, price, image, instructor, instructor_image, description, duration
+     FROM courses WHERE slug = $1 LIMIT 1`,
     [params.slug]
   );
 
@@ -48,12 +53,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   // Check if user is already enrolled
   const enrollments = await executeQuery(
-    `
-    SELECT id
-    FROM enrollments
-    WHERE user_id = $1 AND course_id = $2
-    LIMIT 1
-  `,
+    `SELECT id FROM enrollments WHERE user_id = $1 AND course_id = $2 LIMIT 1`,
     [user.id, course.id]
   );
 
@@ -61,22 +61,43 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     redirect(`/academy/courses/${params.slug}/learn`);
   }
 
-  // Handle enrollment
-  async function handleEnrollment(formData: FormData) {
+  // Handle checkout session creation
+  // async function handleCheckout() {
+  //   "use server";
+
+  //   const result = await createCourseCheckoutSession(
+  //     user,
+  //     course.id,
+  //     params.slug
+  //   );
+
+  //   if (result.success && result.sessionUrl) {
+  //     redirect(result.sessionUrl);
+  //   } else {
+  //     redirect(
+  //       `/academy/courses/${params.slug}/checkout?error=${encodeURIComponent(result.error || "Payment failed")}`
+  //     );
+  //   }
+  // }
+
+  async function handleCheckout() {
     "use server";
+    console.log("clicked");
 
-    // In a real app, you would process the payment here
-    // For now, we'll just enroll the user
-    const result = await enrollInCourse(course.id, "pi_mock_payment_intent_id");
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/create-checkout-session`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user, course }),
+      }
+    );
 
-    if (result.success) {
-      redirect(`/academy/courses/${params.slug}/success`);
+    const data = await res.json();
+    if (data.url) {
+      redirect(data.url);
     } else {
-      // Handle error
-      console.error("Enrollment failed:", result);
-      redirect(
-        `/academy/courses/${params.slug}/checkout?error=enrollment_failed`
-      );
+      alert("Something went wrong!");
     }
   }
 
@@ -93,140 +114,120 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
             </Link>
           </div>
 
+          {/* Error Alert */}
+          {searchParams.error && (
+            <Alert className="mb-6 border-red-200 bg-red-50">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                {decodeURIComponent(searchParams.error)}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Canceled Alert */}
+          {searchParams.canceled && (
+            <Alert className="mb-6 border-yellow-200 bg-yellow-50">
+              <AlertCircle className="h-4 w-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-800">
+                Payment was canceled. You can try again when you're ready.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Checkout Form */}
+            {/* Checkout Information */}
             <div className="md:col-span-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>Complete Your Purchase</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Secure Checkout
+                  </CardTitle>
                   <CardDescription>
-                    Enter your payment details to enroll in this course
+                    Complete your purchase to get instant access to this course
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form action={handleEnrollment}>
-                    <div className="space-y-6">
-                      {/* Personal Information */}
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">
-                          Personal Information
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="col-span-2 sm:col-span-1">
-                            <Label htmlFor="first-name">First Name</Label>
-                            <Input
-                              id="first-name"
-                              defaultValue={user.name.split(" ")[0]}
-                              required
-                            />
-                          </div>
-                          <div className="col-span-2 sm:col-span-1">
-                            <Label htmlFor="last-name">Last Name</Label>
-                            <Input
-                              id="last-name"
-                              defaultValue={user.name
-                                .split(" ")
-                                .slice(1)
-                                .join(" ")}
-                              required
-                            />
-                          </div>
-                          <div className="col-span-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                              id="email"
-                              type="email"
-                              defaultValue={user.email}
-                              required
-                            />
-                          </div>
+                  <div className="space-y-6">
+                    {/* Security Features */}
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <Shield className="h-5 w-5 text-green-600 mt-0.5" />
+                        <div>
+                          <h3 className="font-medium text-green-900">
+                            Secure Payment
+                          </h3>
+                          <p className="text-sm text-green-700 mt-1">
+                            Your payment information is encrypted and processed
+                            securely by Stripe. We never store your credit card
+                            details.
+                          </p>
                         </div>
-                      </div>
-
-                      <Separator />
-
-                      {/* Payment Information */}
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">
-                          Payment Information
-                        </h3>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="card-number">Card Number</Label>
-                            <Input
-                              id="card-number"
-                              placeholder="4242 4242 4242 4242"
-                              required
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                              For testing, use 4242 4242 4242 4242 with any
-                              future date and any CVC
-                            </p>
-                          </div>
-                          <div className="grid grid-cols-3 gap-4">
-                            <div className="col-span-1">
-                              <Label htmlFor="expiry-month">Month</Label>
-                              <Input
-                                id="expiry-month"
-                                placeholder="MM"
-                                required
-                              />
-                            </div>
-                            <div className="col-span-1">
-                              <Label htmlFor="expiry-year">Year</Label>
-                              <Input
-                                id="expiry-year"
-                                placeholder="YY"
-                                required
-                              />
-                            </div>
-                            <div className="col-span-1">
-                              <Label htmlFor="cvc">CVC</Label>
-                              <Input id="cvc" placeholder="123" required />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center pt-4">
-                        <div className="text-sm text-gray-500">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <Image
-                              src="/visa-logo.png"
-                              alt="Visa"
-                              width={32}
-                              height={10}
-                            />
-                            <Image
-                              src="/mastercard-logo.png"
-                              alt="Mastercard"
-                              width={32}
-                              height={20}
-                            />
-                            <Image
-                              src="/amex-logo.png"
-                              alt="American Express"
-                              width={32}
-                              height={20}
-                            />
-                            <Image
-                              src="/paypal-logo.png"
-                              alt="PayPal"
-                              width={32}
-                              height={20}
-                            />
-                          </div>
-                          <p>Your payment information is secure</p>
-                        </div>
-                        <Button
-                          type="submit"
-                          className="bg-purple-700 hover:bg-purple-800"
-                        >
-                          Complete Purchase
-                        </Button>
                       </div>
                     </div>
-                  </form>
+
+                    {/* Course Access Info */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <h3 className="font-medium text-blue-900">
+                            Instant Access
+                          </h3>
+                          <p className="text-sm text-blue-700 mt-1">
+                            Get immediate access to all course materials after
+                            successful payment. Start learning right away!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Methods */}
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">
+                        Accepted Payment Methods
+                      </h3>
+                      <div className="flex items-center space-x-4 mb-4">
+                        <Image
+                          src="/visa-logo.png"
+                          alt="Visa"
+                          width={40}
+                          height={25}
+                          className="opacity-70"
+                        />
+                        <Image
+                          src="/mastercard-logo.png"
+                          alt="Mastercard"
+                          width={40}
+                          height={25}
+                          className="opacity-70"
+                        />
+                        <Image
+                          src="/amex-logo.png"
+                          alt="American Express"
+                          width={40}
+                          height={25}
+                          className="opacity-70"
+                        />
+                        <div className="text-sm text-gray-600">Apple Pay</div>
+                        <div className="text-sm text-gray-600">Google Pay</div>
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        All payments are processed securely through Stripe
+                      </p>
+                    </div>
+
+                    <Separator />
+
+                    {/* Checkout Form */}
+                    <Suspense fallback={<div>Loading checkout...</div>}>
+                      <CheckoutForm
+                        course={course}
+                        user={user}
+                        onCheckout={handleCheckout}
+                      />
+                    </Suspense>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -238,8 +239,8 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-start space-x-4 mb-4">
-                    <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
+                  <div className="flex items-start space-x-4 mb-6">
+                    <div className="relative h-20 w-20 rounded-md overflow-hidden flex-shrink-0">
                       <Image
                         src={course.image || "/placeholder.svg"}
                         alt={course.title}
@@ -247,30 +248,63 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                         className="object-cover"
                       />
                     </div>
-                    <div>
-                      <h3 className="font-medium">{course.title}</h3>
-                      <p className="text-sm text-gray-500">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-sm leading-tight">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
                         By {course.instructor}
                       </p>
+                      {course.duration && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          {course.duration}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span>Original Price</span>
+                      <span>Course Price</span>
                       <span>${Number.parseFloat(course.price).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between font-medium">
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount</span>
+                      <span>$0.00</span>
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between font-medium text-lg">
                       <span>Total</span>
                       <span>${Number.parseFloat(course.price).toFixed(2)}</span>
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="bg-gray-50 text-xs text-gray-500 flex flex-col items-start">
-                  <p className="mb-1">30-Day Money-Back Guarantee</p>
-                  <p>Full Lifetime Access</p>
+                <CardFooter className="bg-gray-50 text-xs text-gray-500 flex flex-col items-start space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-3 w-3" />
+                    <span>30-Day Money-Back Guarantee</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3 w-3" />
+                    <span>Full Lifetime Access</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-3 w-3" />
+                    <span>Secure Payment Processing</span>
+                  </div>
                 </CardFooter>
               </Card>
+
+              {/* Trust Indicators */}
+              <div className="mt-6 text-center">
+                <div className="flex justify-center items-center space-x-2 text-xs text-gray-500 mb-2">
+                  <Shield className="h-4 w-4" />
+                  <span>SSL Encrypted</span>
+                </div>
+                <p className="text-xs text-gray-400">
+                  Your personal and payment information is always safe
+                </p>
+              </div>
             </div>
           </div>
         </div>

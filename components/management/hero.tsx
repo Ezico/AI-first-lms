@@ -1,9 +1,17 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useState } from "react";
+import WaitlistModal from "../WaitlistModal";
 
 export default function Hero() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <section className="relative bg-gradient-to-b from-primary-50 to-white py-20 md:py-32">
+      <WaitlistModal
+        courseName={"Launch Your Project Management Career with AI"}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
       <div className="container px-4 md:px-6">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
           <div className="space-y-4">
@@ -35,6 +43,7 @@ export default function Hero() {
                 Register for Future Dates
               </Button> */}
               <Button
+                onClick={() => setIsOpen(true)}
                 size="lg"
                 variant="ghost"
                 className="bg-white text-primary hover:bg-white/90"

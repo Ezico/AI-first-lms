@@ -53,7 +53,6 @@ export default function NewCoursePage() {
         </CardHeader>
         <CardContent>
           <form action={createCourse} className="space-y-8">
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Course Title</Label>
@@ -196,7 +195,6 @@ export default function NewCoursePage() {
                 Create Course
               </Button>
             </div>
-            
           </form>
         </CardContent>
       </Card>

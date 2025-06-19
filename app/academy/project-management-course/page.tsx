@@ -1,3 +1,4 @@
+"use client";
 import Hero from "@/components/management/hero";
 import Benefits from "@/components/management/benefits";
 import HowItWorks from "@/components/management/how-it-works";

@@ -2,7 +2,6 @@
 import MainFooter from "@/components/main-footer";
 import MainNavigation from "@/components/main-navigation";
 import { Reveal } from "@/components/reveal";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";

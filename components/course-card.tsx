@@ -19,7 +19,7 @@ export default function CourseCard({
   // Default values for rating and enrolled if they're undefined
   const rating = course.rating || 4.5;
   const enrolled = course.enrolled || 0;
-  console.log(course);
+  // console.log(course);
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
       <div className="relative h-48 w-full">

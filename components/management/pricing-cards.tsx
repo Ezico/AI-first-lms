@@ -1,13 +1,26 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check } from "lucide-react"
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Check } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function PricingCards() {
+  const [loading, setLoading] = useState(false);
   const plans = [
     {
       name: "Standard",
-      price: "$499",
-      description: "Everything you need to get started with AI project management",
+      price: 499,
+      slug: "launch-your-project-management-career-with-ai-standard-",
+      description:
+        "Everything you need to get started with AI project management",
       features: [
         "8-week course access",
         "Basic AI tools integration",
@@ -18,8 +31,10 @@ export default function PricingCards() {
     },
     {
       name: "Premium",
-      price: "$899",
-      description: "Advanced features and personalized support for serious learners",
+      price: 899,
+      slug: "launch-your-project-management-career-with-ai-premium-",
+      description:
+        "Advanced features and personalized support for serious learners",
       features: [
         "Everything in Standard",
         "1-on-1 mentorship sessions",
@@ -30,7 +45,7 @@ export default function PricingCards() {
       ],
       popular: true,
     },
-  ]
+  ];
 
   return (
     <section className="py-16 bg-gray-50" id="pricing">
@@ -45,7 +60,10 @@ export default function PricingCards() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
-            <Card key={index} className={`relative bg-white ${plan.popular ? "border-primary shadow-lg" : ""}`}>
+            <Card
+              key={index}
+              className={`relative bg-white ${plan.popular ? "border-primary shadow-lg" : ""}`}
+            >
               {plan.popular && (
                 <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
                   <span className="bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full">
@@ -54,12 +72,18 @@ export default function PricingCards() {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-2xl text-gray-900">{plan.name}</CardTitle>
+                <CardTitle className="text-2xl text-gray-900">
+                  {plan.name}
+                </CardTitle>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                  <span className="text-4xl font-bold text-gray-900">
+                    {plan.price}
+                  </span>
                   <span className="text-gray-500 ml-2">one-time payment</span>
                 </div>
-                <CardDescription className="mt-2 text-gray-600">{plan.description}</CardDescription>
+                <CardDescription className="mt-2 text-gray-600">
+                  {plan.description}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
@@ -72,16 +96,18 @@ export default function PricingCards() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button
-                  className={`w-full ${plan.popular ? "bg-primary hover:bg-primary text-white" : "bg-primary hover:bg-primary text-white"}`}
-                >
-                  Enroll Now
-                </Button>
+                <Link href={`/academy/courses/simple/${plan.slug}/checkout`}>
+                  <Button
+                    className={`w-full ${plan.popular ? "bg-primary hover:bg-primary text-white" : "bg-primary hover:bg-primary text-white"}`}
+                  >
+                    {loading ? "Processing..." : "Enroll Now"}
+                  </Button>
+                </Link>
               </CardFooter>
             </Card>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

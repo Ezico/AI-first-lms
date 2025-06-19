@@ -30,6 +30,7 @@ dayjs.extend(relativeTime);
 interface DashboardClientProps {
   user: User;
   notes: any[];
+  purchases: any[];
   enrollments: any[];
   recommendedCourses: any[];
 }
@@ -37,6 +38,7 @@ interface DashboardClientProps {
 export default function DashboardClient({
   user,
   notes,
+  purchases,
   enrollments,
   recommendedCourses,
 }: DashboardClientProps) {
@@ -94,7 +96,7 @@ export default function DashboardClient({
                   <p className="text-purple-100">{user.email}</p>
                 </div>
               </div>
-              <div>
+              {/* <div>
                 <Link href="/profile">
                   <Button
                     variant="outline"
@@ -104,7 +106,7 @@ export default function DashboardClient({
                     Profile Settings
                   </Button>
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -121,6 +123,7 @@ export default function DashboardClient({
               >
                 <TabsList className="mb-6">
                   <TabsTrigger value="my-courses">My Courses</TabsTrigger>
+                  <TabsTrigger value="purchases">Purchases</TabsTrigger>
                   <TabsTrigger value="certificates">Certificates</TabsTrigger>
                   <TabsTrigger value="notes">My Notes</TabsTrigger>
                 </TabsList>
@@ -215,6 +218,70 @@ export default function DashboardClient({
                         </h3>
                         <p className="text-gray-600 mb-6">
                           You haven't enrolled in any courses yet. Browse our
+                          catalog to find courses that interest you.
+                        </p>
+                        <Link href="/academy">
+                          <Button className="bg-purple-700 hover:bg-purple-800">
+                            Browse Courses
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                <TabsContent value="purchases">
+                  <div className="space-y-6">
+                    <h2 className="text-xl font-bold text-gray-900">
+                      My Purchases
+                    </h2>
+
+                    {purchases.length > 0 ? (
+                      <div className="space-y-4">
+                        {purchases.map((purchase) => (
+                          <div
+                            key={purchase.id}
+                            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                          >
+                            <div className="flex flex-col md:flex-row">
+                              <div className="md:w-1/4 relative h-48 md:h-auto">
+                                <Image
+                                  src={purchase.imageUrl || "/placeholder.svg"}
+                                  alt={purchase.title}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                              <div className="p-6 md:w-3/4">
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                  {purchase.title}
+                                </h3>
+                                <div className="flex items-center text-sm text-gray-600 mb-4">
+                                  <Clock className="h-4 w-4 mr-1" />
+                                  {purchase.duration}
+                                </div>
+
+                                <div className="flex flex-wrap gap-3">
+                                  <Link href={`#`}>
+                                    <Button className="bg-purple-700 hover:bg-purple-800">
+                                      Download files
+                                    </Button>
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+                        <div className="mb-4">
+                          <BookOpen className="h-12 w-12 text-gray-400 mx-auto" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          No Purchases yet
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                          You haven't purchased in any item yet. Browse our
                           catalog to find courses that interest you.
                         </p>
                         <Link href="/academy">
@@ -425,7 +492,7 @@ export default function DashboardClient({
                     {user.role === "admin" ? "Administrator" : "Student"}
                   </p>
                 </div>
-                <div className="border-t border-gray-200 pt-4 mt-4">
+                {/* <div className="border-t border-gray-200 pt-4 mt-4">
                   <Link href="/profile">
                     <Button
                       variant="outline"
@@ -435,7 +502,7 @@ export default function DashboardClient({
                       Edit Profile
                     </Button>
                   </Link>
-                </div>
+                </div> */}
               </div>
 
               {/* Progress Summary */}

@@ -3,6 +3,7 @@ import DashboardClient from "@/components/academy/dashboard-client";
 import {
   getUserEnrollments,
   getUserNotesWithCourseInfo,
+  getUserPurchasedCourse,
 } from "@/lib/actions/enrollment";
 import { executeQuery } from "@/lib/db";
 
@@ -12,7 +13,9 @@ export default async function DashboardPage() {
 
   // Get user enrollments
   const enrollments = await getUserEnrollments();
+  const purchases = await getUserPurchasedCourse();
 
+  // console.log(purchases);
   // Get recommended courses (courses user is not enrolled in)
   const recommendedCourses = await executeQuery(
     `
@@ -42,6 +45,7 @@ export default async function DashboardPage() {
     <DashboardClient
       user={user}
       notes={notes}
+      purchases={purchases}
       enrollments={enrollments}
       recommendedCourses={recommendedCourses || []}
     />

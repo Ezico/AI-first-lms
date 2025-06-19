@@ -105,6 +105,7 @@ const pricingTiers = [
   {
     name: "Standard",
     price: 799,
+    slug: "deliver-smarter-projects-with-ai",
     features: [
       "8-week core curriculum",
       "AI tools training",
@@ -117,6 +118,7 @@ const pricingTiers = [
   {
     name: "Pro",
     price: 1299,
+    slug: "deliver-smarter-projects-with-ai-pro",
     features: [
       "Everything in Standard",
       "1-on-1 mentoring sessions",
@@ -130,6 +132,7 @@ const pricingTiers = [
   {
     name: "Premium",
     price: 2499,
+    slug: "deliver-smarter-projects-with-ai-premium",
     features: [
       "Everything in Pro",
       "Custom AI solution development",
@@ -143,41 +146,17 @@ const pricingTiers = [
 ];
 
 export default function AIProjectManagerFoundations() {
-  const [selectedDate, setSelectedDate] = useState<string>("");
-  const [selectedTier, setSelectedTier] = useState<string>("pro");
-  const [email, setEmail] = useState("");
-  const [showWaitlistForm, setShowWaitlistForm] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
-  const getSelectedDateInfo = () => {
-    return courseDates.find((date) => date.id === selectedDate);
-  };
-
-  const handleEnrollment = () => {
-    const dateInfo = getSelectedDateInfo();
-    if (dateInfo?.availability === "waitlist") {
-      setShowWaitlistForm(true);
-    } else {
-      // Redirect to payment
-      console.log("Redirecting to payment...");
-    }
-  };
-
-  const handleWaitlistSubmit = () => {
-    console.log("Waitlist submission:", {
-      email,
-      date: selectedDate,
-      tier: selectedTier,
-    });
-    setShowWaitlistForm(false);
-    setEmail("");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <MainNavigation />
       {/* Hero Section */}
-      <QuickViewModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <QuickViewModal
+        courseName={"Deliver Smarter Projects with AI"}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
       <section className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-purple-600 to-purple-800 text-white">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
@@ -385,12 +364,14 @@ export default function AIProjectManagerFoundations() {
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className={`w-full mt-8 ${tier.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-800 hover:bg-gray-900"}`}
-                    onClick={() => setSelectedTier(tier.name.toLowerCase())}
-                  >
-                    Select {tier.name}
-                  </Button>
+                  <Link href={`/academy/courses/simple/${tier.slug}/checkout`}>
+                    <Button
+                      className={`w-full mt-8 ${tier.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-800 hover:bg-gray-900"}`}
+                      onClick={() => setSelectedTier(tier.name.toLowerCase())}
+                    >
+                      Select {tier.name}
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}

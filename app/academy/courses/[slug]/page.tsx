@@ -89,13 +89,13 @@ export default async function CoursePage({ params }: CoursePageProps) {
                 <h1 className="text-3xl md:text-4xl font-bold mb-4">
                   {course.title}
                 </h1>
-                <p className="text-lg text-purple-100 mb-6">
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: snippet,
-                    }}
-                  />
-                </p>
+
+                <div
+                  className="text-lg text-purple-100 mb-6"
+                  dangerouslySetInnerHTML={{
+                    __html: snippet,
+                  }}
+                />
 
                 <div className="flex flex-wrap items-center gap-6 mb-6">
                   <div className="flex items-center">

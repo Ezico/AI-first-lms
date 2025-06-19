@@ -1,119 +1,155 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { AlertCircle, Camera, Check, CreditCard, Key, User } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { updateUserProfile, updateUserPassword } from "@/lib/actions/user"
-import type { User as AuthUser } from "@/lib/auth-utils"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertCircle,
+  Camera,
+  Check,
+  CreditCard,
+  Key,
+  User,
+} from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { updateUserProfile, updateUserPassword } from "@/lib/actions/user";
+import type { User as AuthUser } from "@/lib/auth-utils";
 
 interface ProfileSettingsProps {
-  user: AuthUser
+  user: AuthUser;
 }
 
 export default function ProfileSettings({ user }: ProfileSettingsProps) {
-  const router = useRouter()
-  const [name, setName] = useState(user.name || "")
-  const [email, setEmail] = useState(user.email || "")
-  const [bio, setBio] = useState("")
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(user.image || null)
-  const [imageFile, setImageFile] = useState<File | null>(null)
+  const router = useRouter();
+  const [name, setName] = useState(user.name || "");
+  const [email, setEmail] = useState(user.email || "");
+  const [bio, setBio] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    user.image || null
+  );
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file)
-      const reader = new FileReader()
+      setImageFile(file);
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setMessage(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
 
     try {
-      const formData = new FormData()
-      formData.append("name", name)
-      formData.append("email", email)
-      formData.append("bio", bio)
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("bio", bio);
       if (imageFile) {
-        formData.append("image", imageFile)
+        formData.append("image", imageFile);
       }
 
-      const result = await updateUserProfile(formData)
+      const result = await updateUserProfile(formData);
 
       if (result.error) {
-        setMessage({ type: "error", text: result.error })
+        setMessage({ type: "error", text: result.error });
       } else {
-        setMessage({ type: "success", text: "Profile updated successfully" })
-        router.refresh()
+        setMessage({ type: "success", text: "Profile updated successfully" });
+        router.refresh();
       }
     } catch (error) {
-      setMessage({ type: "error", text: "An error occurred. Please try again." })
+      setMessage({
+        type: "error",
+        text: "An error occurred. Please try again.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setMessage(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
 
     if (newPassword !== confirmPassword) {
-      setMessage({ type: "error", text: "New passwords do not match" })
-      setIsSubmitting(false)
-      return
+      setMessage({ type: "error", text: "New passwords do not match" });
+      setIsSubmitting(false);
+      return;
     }
 
     try {
-      const formData = new FormData()
-      formData.append("currentPassword", currentPassword)
-      formData.append("newPassword", newPassword)
+      const formData = new FormData();
+      formData.append("currentPassword", currentPassword);
+      formData.append("newPassword", newPassword);
 
-      const result = await updateUserPassword(formData)
+      const result = await updateUserPassword(formData);
 
       if (result.error) {
-        setMessage({ type: "error", text: result.error })
+        setMessage({ type: "error", text: result.error });
       } else {
-        setMessage({ type: "success", text: "Password updated successfully" })
-        setCurrentPassword("")
-        setNewPassword("")
-        setConfirmPassword("")
+        setMessage({ type: "success", text: "Password updated successfully" });
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
       }
     } catch (error) {
-      setMessage({ type: "error", text: "An error occurred. Please try again." })
+      setMessage({
+        type: "error",
+        text: "An error occurred. Please try again.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile Settings</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        Profile Settings
+      </h1>
 
       {message && (
-        <Alert variant={message.type === "error" ? "destructive" : "default"} className="mb-6">
-          {message.type === "error" ? <AlertCircle className="h-4 w-4" /> : <Check className="h-4 w-4" />}
-          <AlertTitle>{message.type === "error" ? "Error" : "Success"}</AlertTitle>
+        <Alert
+          variant={message.type === "error" ? "destructive" : "default"}
+          className="mb-6"
+        >
+          {message.type === "error" ? (
+            <AlertCircle className="h-4 w-4" />
+          ) : (
+            <Check className="h-4 w-4" />
+          )}
+          <AlertTitle>
+            {message.type === "error" ? "Error" : "Success"}
+          </AlertTitle>
           <AlertDescription>{message.text}</AlertDescription>
         </Alert>
       )}
@@ -138,7 +174,9 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           <Card>
             <CardHeader>
               <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your profile information and email address.</CardDescription>
+              <CardDescription>
+                Update your profile information and email address.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleProfileUpdate} className="space-y-6">
@@ -146,7 +184,9 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                   <div className="relative mb-4">
                     <Avatar className="h-24 w-24">
                       <AvatarImage src={imagePreview || ""} alt={name} />
-                      <AvatarFallback className="text-2xl">{name.charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback className="text-2xl">
+                        {name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
                     <label
                       htmlFor="profile-image"
@@ -162,18 +202,31 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                       onChange={handleImageChange}
                     />
                   </div>
-                  <p className="text-sm text-gray-500">Click the camera icon to upload a new photo</p>
+                  <p className="text-sm text-gray-500">
+                    Click the camera icon to upload a new photo
+                  </p>
                 </div>
 
                 <div className="grid gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
                   </div>
 
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
                   </div>
 
                   <div className="grid gap-2">
@@ -188,7 +241,11 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                   </div>
                 </div>
 
-                <Button type="submit" className="bg-purple-700 hover:bg-purple-800" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="bg-purple-700 hover:bg-purple-800"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>
               </form>
@@ -200,7 +257,9 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           <Card>
             <CardHeader>
               <CardTitle>Change Password</CardTitle>
-              <CardDescription>Update your password to keep your account secure.</CardDescription>
+              <CardDescription>
+                Update your password to keep your account secure.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePasswordUpdate} className="space-y-6">
@@ -228,7 +287,9 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
+                    <Label htmlFor="confirm-password">
+                      Confirm New Password
+                    </Label>
                     <Input
                       id="confirm-password"
                       type="password"
@@ -239,7 +300,11 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                   </div>
                 </div>
 
-                <Button type="submit" className="bg-purple-700 hover:bg-purple-800" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="bg-purple-700 hover:bg-purple-800"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Updating..." : "Update Password"}
                 </Button>
               </form>
@@ -251,7 +316,9 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           <Card>
             <CardHeader>
               <CardTitle>Payment Methods</CardTitle>
-              <CardDescription>Manage your payment methods for course purchases.</CardDescription>
+              <CardDescription>
+                Manage your payment methods for course purchases.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -272,20 +339,26 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                   </div>
                 </div>
 
-                <Button className="bg-purple-700 hover:bg-purple-800 w-full">Add Payment Method</Button>
+                <Button className="bg-purple-700 hover:bg-purple-800 w-full">
+                  Add Payment Method
+                </Button>
               </div>
             </CardContent>
             <CardFooter className="border-t pt-6">
               <div className="space-y-2 w-full">
                 <h3 className="font-medium">Stripe Test Cards</h3>
-                <p className="text-sm text-gray-500">Use these test cards for course enrollment:</p>
+                <p className="text-sm text-gray-500">
+                  Use these test cards for course enrollment:
+                </p>
                 <div className="space-y-2 text-sm">
                   <div className="p-3 bg-gray-50 rounded-md">
                     <p>
-                      <span className="font-medium">Card Number:</span> 4242 4242 4242 4242
+                      <span className="font-medium">Card Number:</span> 4242
+                      4242 4242 4242
                     </p>
                     <p>
-                      <span className="font-medium">Expiry:</span> Any future date (e.g., 12/25)
+                      <span className="font-medium">Expiry:</span> Any future
+                      date (e.g., 12/25)
                     </p>
                     <p>
                       <span className="font-medium">CVC:</span> Any 3 digits
@@ -295,7 +368,8 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                     </p>
                   </div>
                   <p className="text-xs text-gray-500">
-                    This is a test card that will always succeed. No real charges will be made.
+                    This is a test card that will always succeed. No real
+                    charges will be made.
                   </p>
                 </div>
               </div>
@@ -304,5 +378,5 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
