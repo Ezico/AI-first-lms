@@ -11,6 +11,7 @@ import {
   Calendar,
 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Component() {
@@ -19,6 +20,15 @@ export default function Component() {
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const searchParams = useSearchParams();
+  const cohortDate = searchParams.get("cohortDate");
+  const slug = searchParams.get("slug");
+
+  // for slug, replace - with space
+  const formattedSlug = slug ? slug.replace(/-/g, " ") : "Course";
+  // console.log("Cohort Date:", cohortDate);
+  // console.log("Slug:", slug);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
@@ -149,9 +159,11 @@ export default function Component() {
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
                 <div>
-                  <p className="font-medium text-sm">Instant Access</p>
+                  <p className="font-medium text-sm">Email Notification</p>
                   <p className="text-sm text-gray-600">
-                    Your course is ready for download/leaning
+                    you will recieve an email remainder for your selected cohort
+                    date, <br /> you selected on <b>{cohortDate}</b> for the
+                    course <b>{formattedSlug}</b>
                   </p>
                 </div>
               </div>

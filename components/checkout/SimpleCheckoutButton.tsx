@@ -6,21 +6,28 @@ import { useState } from "react";
 
 export function SimpleCheckoutButton({
   slug,
+  cohortDate,
   user,
   price,
 }: {
   slug: string;
   user: any;
   price: any;
+  cohortDate: any;
 }) {
   const [loading, setLoading] = useState(false);
+
+  console.log(
+    `SimpleCheckoutButton rendered with slug: ${slug}, cohortDate: ${cohortDate}, user:`,
+    user
+  );
 
   const handleCheckout = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/checkout/simple-course", {
         method: "POST",
-        body: JSON.stringify({ slug, user }),
+        body: JSON.stringify({ slug, user, cohortDate }),
       });
 
       const data = await res.json();

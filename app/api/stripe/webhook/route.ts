@@ -32,15 +32,16 @@ export async function POST(req: Request) {
     const userId = session.metadata.userId;
     const email = session.metadata.email;
     const courseId = session.metadata.courseId;
+    const cohortDate = session.metadata.cohortDate;
     const courseType = session.metadata.type; //
     const paymentIntent = event.data.object;
 
     if (courseType === "simple") {
       // Store purchase
+
       await sql`
-      INSERT INTO "SimpleCoursePurchase" ("userid", "courseid", "createdat")
-      VALUES (${userId}, ${courseId}, NOW());
-    `;
+      INSERT INTO "SimpleCoursePurchase" (userId, courseId, cohortdate, createdat)
+      VALUES (${userId}, ${courseId}, ${cohortDate}, NOW());`;
     } else {
       console.log(`Enroll user ${userId} to course ${courseId}`);
       const existingEnrollment = await executeQuery(

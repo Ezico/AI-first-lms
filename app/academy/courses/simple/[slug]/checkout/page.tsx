@@ -24,13 +24,18 @@ import { SimpleCheckoutButton } from "@/components/checkout/SimpleCheckoutButton
 const sql = neon(process.env.DATABASE_URL!);
 export default async function SimpleCourseCheckout({
   params,
+  searchParams,
 }: {
   params: { slug: string };
+  searchParams: { cohortDate?: string };
 }) {
+  // get search params cohortDate from url
+  const cohortDate = searchParams.cohortDate;
+
   const user = await requireAuth(
     "/auth/signin?callbackUrl=/academy/courses/simple/" +
       params.slug +
-      "/checkout"
+      `/checkout?cohortDate=${cohortDate}`
   );
 
   const course = await sql`
@@ -136,6 +141,7 @@ export default async function SimpleCourseCheckout({
                     {/* Checkout Form */}
                     <SimpleCheckoutButton
                       slug={params.slug}
+                      cohortDate={cohortDate}
                       user={user}
                       price={data.price}
                     />

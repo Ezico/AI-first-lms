@@ -36,12 +36,6 @@ interface CourseDate {
   seatsLeft?: number;
 }
 
-const courseDates: CourseDate[] = [
-  { id: "aug5", date: "August 5, 2024", availability: "limited", seatsLeft: 4 },
-  { id: "oct7", date: "October 7, 2024", availability: "available" },
-  { id: "jan6", date: "January 6, 2025", availability: "waitlist" },
-];
-
 const benefits = [
   {
     icon: <Brain className="h-8 w-8 text-blue-600" />,
@@ -147,6 +141,16 @@ const pricingTiers = [
 
 export default function AIProjectManagerFoundations() {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const cohortDates = [
+    { value: "2023-07-08", label: "July 8, 2023" },
+    { value: "2023-09-02", label: "September 2, 2023" },
+    { value: "2023-11-04", label: "November 4, 2023" },
+  ];
+
+  const handleDateChange = (value: string) => {
+    setSelectedDate(value);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -364,10 +368,25 @@ export default function AIProjectManagerFoundations() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={`/academy/courses/simple/${tier.slug}/checkout`}>
+
+                  <Select onValueChange={handleDateChange}>
+                    <SelectTrigger className="w-full mt-5 border-gray-200 focus:border-gray-500">
+                      <SelectValue placeholder="Choose a date" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cohortDates.map((date) => (
+                        <SelectItem key={date.value} value={date.value}>
+                          {date.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Link
+                    href={`/academy/courses/simple/${tier.slug}/checkout?cohortDate=${selectedDate}`}
+                  >
                     <Button
-                      className={`w-full mt-8 ${tier.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-800 hover:bg-gray-900"}`}
-                      onClick={() => setSelectedTier(tier.name.toLowerCase())}
+                      className={`w-full mt-1 ${tier.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-800 hover:bg-gray-900"}`}
+                      // onClick={() => setSelectedTier(tier.name.toLowerCase())}
                     >
                       Select {tier.name}
                     </Button>

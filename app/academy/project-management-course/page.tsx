@@ -9,7 +9,14 @@ import EnrollmentArea from "@/components/management/enrollment-area";
 import MainNavigation from "@/components/main-navigation";
 import MainFooter from "@/components/main-footer";
 
-export default function Home() {
+export default function Home() { 
+  const cohortDates = [
+      { value: "2023-07-08", label: "July 8, 2023" },
+      { value: "2023-09-02", label: "September 2, 2023" },
+      { value: "2023-11-04", label: "November 4, 2023" },
+    ]
+
+    
   return (
     <div className="flex min-h-screen flex-col">
       <MainNavigation />
@@ -19,7 +26,7 @@ export default function Home() {
       <CapstonePreview />
       <PricingCards />
       <FAQ />
-      {/* <EnrollmentArea /> */}
+      <EnrollmentArea />
       <MainFooter />
     </div>
   );

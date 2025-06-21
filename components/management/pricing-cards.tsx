@@ -8,12 +8,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Calendar, Check } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export default function PricingCards() {
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [loading, setLoading] = useState(false);
+
+  const cohortDates = [
+    { value: "2023-07-08", label: "July 8, 2023" },
+    { value: "2023-09-02", label: "September 2, 2023" },
+    { value: "2023-11-04", label: "November 4, 2023" },
+  ];
+
+  const handleDateChange = (value: string) => {
+    setSelectedDate(value);
+  };
+
   const plans = [
     {
       name: "Standard",
@@ -96,13 +115,42 @@ export default function PricingCards() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Link href={`/academy/courses/simple/${plan.slug}/checkout`}>
-                  <Button
-                    className={`w-full ${plan.popular ? "bg-primary hover:bg-primary text-white" : "bg-primary hover:bg-primary text-white"}`}
-                  >
-                    {loading ? "Processing..." : "Enroll Now"}
-                  </Button>
-                </Link>
+                <div className="container px-4 md:px-6">
+                  <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div>
+                      <label
+                        htmlFor="cohort-date"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Select Cohort Start Date
+                      </label>
+                      <div className="flex items-center">
+                        <Calendar className="mr-2 h-5 w-5 text-gray-500" />
+                        <Select onValueChange={handleDateChange}>
+                          <SelectTrigger className="w-full border-gray-200 focus:border-gray-500">
+                            <SelectValue placeholder="Choose a date" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cohortDates.map((date) => (
+                              <SelectItem key={date.value} value={date.value}>
+                                {date.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Link
+                        href={`/academy/courses/simple/${plan.slug}/checkout?cohortDate=${selectedDate}`}
+                      >
+                        <Button
+                          className={`w-full mt-5 ${plan.popular ? " bg-primary hover:bg-primary text-white" : "bg-primary hover:bg-primary text-white"}`}
+                        >
+                          {loading ? "Processing..." : "Enroll Now"}
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </CardFooter>
             </Card>
           ))}

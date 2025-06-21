@@ -3,8 +3,8 @@ import { stripe } from "@/lib/stripe"; // make sure this is your stripe SDK setu
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { slug, user } = await req.json();
-
+  const { slug, user, cohortDate } = await req.json();
+  console.log(cohortDate, "cohotDate");
   const course = await sql`
     SELECT * FROM "SimpleCourse" WHERE "slug" = ${slug} LIMIT 1;
   `;
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       userId: user.id,
       courseId: selected.id,
       courseSlug: selected.slug,
-      type: "modular",
+      type: "simple",
     },
   });
 
@@ -49,8 +49,9 @@ export async function POST(req: Request) {
       type: "simple",
       userId: user.id,
       email: user.email,
+      cohortDate: cohortDate,
     },
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/academy/success?${selected.slug}`,
+    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/academy/success?slug=${selected.slug}&cohortDate=${cohortDate}`,
     cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/academy/failure`,
   });
 

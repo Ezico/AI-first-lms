@@ -1,25 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "lucide-react";
 
 export default function EnrollmentArea() {
-  const [selectedDate, setSelectedDate] = useState<string>("")
-  const [cohortFull, setCohortFull] = useState<boolean>(false)
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [cohortFull, setCohortFull] = useState<boolean>(false);
 
   // For demo purposes, we'll simulate the July 8 cohort being full
   const handleDateChange = (value: string) => {
-    setSelectedDate(value)
-    setCohortFull(value === "2023-07-08")
-  }
+    setSelectedDate(value);
+    setCohortFull(value === "2023-07-08");
+  };
 
   const cohortDates = [
     { value: "2023-07-08", label: "July 8, 2023" },
     { value: "2023-09-02", label: "September 2, 2023" },
     { value: "2023-11-04", label: "November 4, 2023" },
-  ]
+  ];
 
   return (
     <section className="py-16 bg-gray-50" id="enroll">
@@ -35,7 +41,10 @@ export default function EnrollmentArea() {
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
           <div className="space-y-6">
             <div>
-              <label htmlFor="cohort-date" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="cohort-date"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Select Cohort Start Date
               </label>
               <div className="flex items-center">
@@ -55,7 +64,8 @@ export default function EnrollmentArea() {
               </div>
               {selectedDate === "2023-07-08" && (
                 <p className="mt-2 text-sm text-amber-600">
-                  This cohort is currently full. You can join the waitlist or select another date.
+                  This cohort is currently full. You can join the waitlist or
+                  select another date.
                 </p>
               )}
             </div>
@@ -89,5 +99,5 @@ export default function EnrollmentArea() {
         </div>
       </div>
     </section>
-  )
+  );
 }
