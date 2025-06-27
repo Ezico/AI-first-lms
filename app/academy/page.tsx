@@ -172,10 +172,13 @@ export default async function AcademyPage() {
                     </p>
                   </div>
                 )}
+
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
                   <div className="relative h-48 w-full">
                     <Image
-                      src={"/images/pm-course.png"}
+                      src={
+                        "https://cdn.shopify.com/s/files/1/0779/1745/4639/files/ai-power.png"
+                      }
                       alt={""}
                       fill
                       className="object-cover"
@@ -240,7 +243,7 @@ export default async function AcademyPage() {
                       <div className="text-xl font-bold text-gray-900">
                         From $499 to $899
                       </div>
-                      <Link href={`/academy/project-management-course`}>
+                      <Link href={`/academy/ai-powered-project-delivery`}>
                         <Button
                           variant={"outline"}
                           className={
@@ -256,7 +259,7 @@ export default async function AcademyPage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
+                {/* <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
                   <div className="relative h-48 w-full">
                     <Image
                       src={"/images/delivery.png"}
@@ -338,7 +341,7 @@ export default async function AcademyPage() {
                       </Link>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Pagination */}

@@ -41,6 +41,7 @@ export default async function DashboardPage() {
 
   const notes = await getUserNotesWithCourseInfo(user.id);
 
+  console.log(purchases);
   return (
     <DashboardClient
       user={user}

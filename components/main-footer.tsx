@@ -64,7 +64,7 @@ export default function MainFooter() {
                   AI First Academy
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/summit"
                   className="text-gray-400 hover:text-white transition-colors"
@@ -79,7 +79,7 @@ export default function MainFooter() {
                 >
                   AI First Podcast
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 

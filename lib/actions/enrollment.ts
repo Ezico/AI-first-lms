@@ -209,9 +209,7 @@ export async function getUserPurchasedCourse() {
   if (!user) {
     return [];
   }
-
   try {
-    // Fetch user enrollments from the database
     const purchases = await sql`
     SELECT s.*, p.createdat
     FROM "SimpleCoursePurchase" p
@@ -219,7 +217,6 @@ export async function getUserPurchasedCourse() {
     WHERE p.userid = ${user.id}
     ORDER BY p.createdat DESC;
   `;
-
     return purchases || [];
   } catch (error) {
     console.error("Get user enrollments error:", error);

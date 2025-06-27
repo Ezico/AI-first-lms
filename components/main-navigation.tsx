@@ -1,39 +1,43 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
-import { UserButton } from "@/components/auth/user-button"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { UserButton } from "@/components/auth/user-button";
 
 // Update the navigation array to include the Team page
 const navigation = [
+  { name: "Home", href: "/" },
   { name: "Book", href: "/book" },
   { name: "Academy", href: "/academy" },
-  { name: "Summit", href: "/summit" },
-  { name: "Podcast", href: "/podcast" },
+  // { name: "Summit", href: "/summit" },
+  // { name: "Podcast", href: "/podcast" },
   { name: "Team", href: "/team" },
-]
+];
 
 export default function MainNavigation() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const pathname = usePathname()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const toggleMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
-  }
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   const closeMenu = () => {
-    setMobileMenuOpen(false)
-  }
+    setMobileMenuOpen(false);
+  };
 
   const isActive = (path: string) => {
-    return pathname === path || pathname.startsWith(`${path}/`)
-  }
+    return pathname === path || pathname.startsWith(`${path}/`);
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
+      <nav
+        className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8"
+        aria-label="Global"
+      >
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">AI First</span>
@@ -61,7 +65,9 @@ export default function MainNavigation() {
               key={item.name}
               href={item.href}
               className={`text-sm font-semibold leading-6 transition-colors ${
-                isActive(item.href) ? "text-purple-700" : "text-gray-900 hover:text-purple-700"
+                isActive(item.href)
+                  ? "text-purple-700"
+                  : "text-gray-900 hover:text-purple-700"
               }`}
             >
               {item.name}
@@ -88,7 +94,11 @@ export default function MainNavigation() {
                   <span className="font-bold text-xl">FIRST</span>
                 </div>
               </Link>
-              <button type="button" className="-m-2.5 rounded-md p-2.5 text-gray-700" onClick={closeMenu}>
+              <button
+                type="button"
+                className="-m-2.5 rounded-md p-2.5 text-gray-700"
+                onClick={closeMenu}
+              >
                 <span className="sr-only">Close menu</span>
                 <X className="h-6 w-6" aria-hidden="true" />
               </button>
@@ -101,7 +111,9 @@ export default function MainNavigation() {
                       key={item.name}
                       href={item.href}
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 ${
-                        isActive(item.href) ? "text-purple-700" : "text-gray-900 hover:bg-gray-50"
+                        isActive(item.href)
+                          ? "text-purple-700"
+                          : "text-gray-900 hover:bg-gray-50"
                       }`}
                       onClick={closeMenu}
                     >
@@ -118,5 +130,5 @@ export default function MainNavigation() {
         </div>
       )}
     </header>
-  )
+  );
 }

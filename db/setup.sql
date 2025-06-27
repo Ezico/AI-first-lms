@@ -1,4 +1,3 @@
--- Create Course table
 CREATE TABLE IF NOT EXISTS "Course" (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -19,7 +18,7 @@ CREATE TABLE IF NOT EXISTS "Course" (
   "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Create Module table
+
 CREATE TABLE IF NOT EXISTS "Module" (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -29,7 +28,7 @@ CREATE TABLE IF NOT EXISTS "Module" (
   "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Create Lesson table
+
 CREATE TABLE IF NOT EXISTS "Lesson" (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -42,7 +41,7 @@ CREATE TABLE IF NOT EXISTS "Lesson" (
   "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Create User table
+
 CREATE TABLE IF NOT EXISTS "User" (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -56,7 +55,7 @@ CREATE TABLE IF NOT EXISTS "User" (
   "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Create Enrollment table
+
 CREATE TABLE IF NOT EXISTS "Enrollment" (
   id TEXT PRIMARY KEY,
   "userId" TEXT NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
@@ -70,7 +69,7 @@ CREATE TABLE IF NOT EXISTS "Enrollment" (
   UNIQUE("userId", "courseId")
 );
 
--- Create Progress table
+
 CREATE TABLE IF NOT EXISTS "Progress" (
   id TEXT PRIMARY KEY,
   "userId" TEXT NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
@@ -82,7 +81,7 @@ CREATE TABLE IF NOT EXISTS "Progress" (
   UNIQUE("userId", "lessonId")
 );
 
--- Create Certificate table
+
 CREATE TABLE IF NOT EXISTS "Certificate" (
   id TEXT PRIMARY KEY,
   "userId" TEXT NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,

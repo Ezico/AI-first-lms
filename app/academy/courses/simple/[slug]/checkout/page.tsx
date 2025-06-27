@@ -10,14 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { requireAuth } from "@/lib/auth-utils";
-import { executeQuery } from "@/lib/db";
-import { createCourseCheckoutSession } from "@/lib/actions/stripe-checkout-actions";
-import { CheckoutForm } from "@/components/checkout/checkout-form";
-import { Suspense } from "react";
-import { AlertCircle, CreditCard, Shield, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CreditCard, Shield, Clock } from "lucide-react";
 import { neon } from "@neondatabase/serverless";
 import { SimpleCheckoutButton } from "@/components/checkout/SimpleCheckoutButton";
 
@@ -140,10 +134,10 @@ export default async function SimpleCourseCheckout({
 
                     {/* Checkout Form */}
                     <SimpleCheckoutButton
-                      slug={params.slug}
+                      slug={params?.slug}
                       cohortDate={cohortDate}
                       user={user}
-                      price={data.price}
+                      price={data?.price}
                     />
                   </div>
                 </CardContent>
@@ -160,22 +154,22 @@ export default async function SimpleCourseCheckout({
                   <div className="flex items-start space-x-4 mb-6">
                     <div className="relative h-20 w-20 rounded-md overflow-hidden flex-shrink-0">
                       <Image
-                        src={data.imageUrl || "/placeholder.svg"}
-                        alt={data.title}
+                        src={data?.imageUrl || "/placeholder.svg"}
+                        alt={data?.title}
                         fill
                         className="object-cover"
                       />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium text-sm leading-tight">
-                        {data.title}
+                        {data?.title}
                       </h3>
                       <p className="text-sm text-gray-500 mt-1">
-                        By {data.instructorName}
+                        By {data?.instructorName}
                       </p>
-                      {data.duration && (
+                      {data?.duration && (
                         <p className="text-xs text-gray-400 mt-1">
-                          {data.duration}
+                          {data?.duration}
                         </p>
                       )}
                     </div>
@@ -184,7 +178,7 @@ export default async function SimpleCourseCheckout({
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span>Course Price</span>
-                      <span>${Number.parseFloat(data.price).toFixed(2)}</span>
+                      <span>${Number.parseFloat(data?.price).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>
@@ -193,7 +187,7 @@ export default async function SimpleCourseCheckout({
                     <Separator />
                     <div className="flex justify-between font-medium text-lg">
                       <span>Total</span>
-                      <span>${Number.parseFloat(data.price).toFixed(2)}</span>
+                      <span>${Number.parseFloat(data?.price).toFixed(2)}</span>
                     </div>
                   </div>
                 </CardContent>
