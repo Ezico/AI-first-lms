@@ -241,7 +241,7 @@ export default async function AcademyPage() {
 
                     <div className="flex justify-between items-center">
                       <div className="text-xl font-bold text-gray-900">
-                        From $499 to $899
+                        $1950
                       </div>
                       <Link href={`/academy/ai-powered-project-delivery`}>
                         <Button
