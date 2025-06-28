@@ -64,10 +64,12 @@ export default async function AcademyPage() {
                   </div>
                 </div>
                 <div className="pt-4">
-                  <Button className="bg-white text-purple-800 hover:bg-purple-50 px-6 py-6 rounded-lg transition-all hover:scale-105 shadow-lg">
-                    <GraduationCap className="mr-2 h-5 w-5" />
-                    Explore Programs
-                  </Button>
+                  <Link href="#courses">
+                    <Button className="bg-white text-purple-800 hover:bg-purple-50 px-6 py-6 rounded-lg transition-all hover:scale-105 shadow-lg">
+                      <GraduationCap className="mr-2 h-5 w-5" />
+                      Explore Programs
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Reveal>
@@ -128,7 +130,7 @@ export default async function AcademyPage() {
       </section> */}
 
       {/* Course Catalog */}
-      <section id="course-catalog" className="bg-gray-50 py-16">
+      <section id="course-catalog" className="bg-gray-50 py-16" id="courses">
         <div className="container mx-auto px-4">
           <Reveal>
             <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
