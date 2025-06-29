@@ -130,7 +130,7 @@ export default async function AcademyPage() {
       </section> */}
 
       {/* Course Catalog */}
-      <section id="course-catalog" className="bg-gray-50 py-16" id="courses">
+      <section className="bg-gray-50 py-16" id="courses">
         <div className="container mx-auto px-4">
           <Reveal>
             <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
